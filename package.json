@@ -1,0 +1,24 @@
+{
+  "name": "blocdash-nextjs-server",
+  "version": "1.0.0",
+  "description": "blocdash",
+  "main": "index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "server": "nodemon dist/index.js",
+    "start-ts": "ts-node src/index.ts",
+    "server-ts": "nodemon --exec ts-node src/index.ts",
+    "watch": "tsc -w"
+  },
+  "author": "DN",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^22.13.1",
+    "nodemon": "^3.1.9",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.7.3"
+  },
+  "dependencies": {
+    "pg": "^8.13.1"
+  }
+}
