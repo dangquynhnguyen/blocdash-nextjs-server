@@ -2,6 +2,7 @@ require("dotenv").config();
 import { ApolloServerPluginLandingPageGraphQLPlayground } from "apollo-server-core";
 import { ApolloServer } from "apollo-server-express";
 import express, { Application } from "express";
+import mongoose from "mongoose";
 import "reflect-metadata";
 import { buildSchema } from "type-graphql";
 import { DataSource } from "typeorm";
@@ -26,12 +27,19 @@ const main = async () => {
 		.catch((error) => console.log("Database", error));
 
 	const app: Application = express();
+
+	// Session/Cookie store
+	await mongoose.connect(
+		`mongodb+srv://${process.env.SESSION_DB_USERNAME_DEV_PROD}:${process.env.SESSION_DB_PASSWORD_DEV_PROD}@blocdash.llh3i.mongodb.net/?retryWrites=true&w=majority&appName=blocdash`
+	);
+
+	console.log("MongoDB connected");
+
 	const apolloServer = new ApolloServer({
 		schema: await buildSchema({
 			resolvers: [HelloResolver, UserResolver],
 			validate: false,
 		}),
-		// context: ({req, res} : Context ) => ({req, res})
 		plugins: [ApolloServerPluginLandingPageGraphQLPlayground],
 	});
 	await apolloServer.start();

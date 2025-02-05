@@ -44,4 +44,6 @@ export const validateRegisterInput = (registerInput: RegisterInput) => {
 				},
 			],
 		};
+
+	return null;
 };
