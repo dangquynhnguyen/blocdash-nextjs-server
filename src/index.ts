@@ -1,11 +1,14 @@
 require("dotenv").config();
 import { ApolloServerPluginLandingPageGraphQLPlayground } from "apollo-server-core";
 import { ApolloServer } from "apollo-server-express";
+import MongoStore from "connect-mongo";
 import express, { Application } from "express";
+import session from "express-session";
 import mongoose from "mongoose";
 import "reflect-metadata";
 import { buildSchema } from "type-graphql";
 import { DataSource } from "typeorm";
+import { __prod__, COOKIE_NAME } from "./constants";
 import { User } from "./entities/User";
 import { HelloResolver } from "./resolvers/hello";
 import { UserResolver } from "./resolvers/user";
@@ -29,17 +32,33 @@ const main = async () => {
 	const app: Application = express();
 
 	// Session/Cookie store
-	await mongoose.connect(
-		`mongodb+srv://${process.env.SESSION_DB_USERNAME_DEV_PROD}:${process.env.SESSION_DB_PASSWORD_DEV_PROD}@blocdash.llh3i.mongodb.net/?retryWrites=true&w=majority&appName=blocdash`
-	);
-
+	const mongoUrl = `mongodb+srv://${process.env.SESSION_DB_USERNAME_DEV_PROD}:${process.env.SESSION_DB_PASSWORD_DEV_PROD}@blocdash.llh3i.mongodb.net/?retryWrites=true&w=majority&appName=blocdash`;
+	await mongoose.connect(mongoUrl);
 	console.log("MongoDB connected");
+
+	app.use(
+		session({
+			name: COOKIE_NAME,
+			store: MongoStore.create({ mongoUrl }),
+			cookie: {
+				maxAge: 1000 * 60 * 60, // one hour
+				httpOnly: true, // JS front end cannot acces the cookie
+				secure: __prod__, // cookie only work in https
+				sameSite: "lax", // protection against CSRF
+				// domain
+			},
+			secret: process.env.SESSION_SECRET_DEV_PROD as string,
+			saveUninitialized: false, // don't save empty sessions, right from the start
+			resave: false,
+		})
+	);
 
 	const apolloServer = new ApolloServer({
 		schema: await buildSchema({
 			resolvers: [HelloResolver, UserResolver],
 			validate: false,
 		}),
+		context: ({ req, res }) => ({ req, res }),
 		plugins: [ApolloServerPluginLandingPageGraphQLPlayground],
 	});
 	await apolloServer.start();
