@@ -23,6 +23,7 @@
   },
   "dependencies": {
     "@typegoose/typegoose": "^12.11.0",
+    "@types/uuid": "^10.0.0",
     "apollo-server-core": "^3.13.0",
     "apollo-server-express": "^3.13.0",
     "argon2": "^0.41.1",
