@@ -24,6 +24,7 @@ const main = async () => {
 		synchronize: true,
 		entities: [User],
 	});
+
 	AppDataSource.initialize()
 		.then(() => {
 			console.log("Database connected :", AppDataSource.options.database);
