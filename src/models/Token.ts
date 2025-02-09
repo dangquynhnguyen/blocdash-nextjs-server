@@ -5,7 +5,7 @@ export class Token {
 	_id!: mongoose.Types.ObjectId;
 
 	@prop({ required: true })
-	userId!: string;
+	userId!: number;
 
 	@prop({ required: true })
 	token!: string;
