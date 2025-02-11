@@ -34,7 +34,7 @@ const main = async () => {
 	const app: Application = express();
 	app.use(
 		cors({
-			origin: "http://localhost:3000",
+			origin: ["http://localhost:3000", "https://blocdash-nextjs.vercel.app"],
 			credentials: true,
 		})
 	);
