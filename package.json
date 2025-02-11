@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "blocdash",
   "main": "index.js",
+  "type": "module",
   "scripts": {
     "start": "node src/index.js",
     "server": "nodemon dist/index.js",

@@ -28,6 +28,9 @@ export const AppDataSource = new DataSource({
 	entities: [User, Transaction],
 });
 
+const app: Application = express();
+const httpServer = http.createServer(app);
+
 const main = async () => {
 	AppDataSource.initialize()
 		.then(() => {
@@ -35,14 +38,13 @@ const main = async () => {
 		})
 		.catch((error) => console.log("Database", error));
 
-	const app: Application = express();
-	const httpServer = http.createServer(app);
 	app.use(
 		cors({
 			origin: ["http://localhost:3000", "https://blocdash-nextjs.vercel.app"],
 			credentials: true,
 		})
 	);
+	app.use(express.json());
 
 	// Session/Cookie store
 	const mongoUrl = `mongodb+srv://${process.env.SESSION_DB_USERNAME_DEV_PROD}:${process.env.SESSION_DB_PASSWORD_DEV_PROD}@blocdash.llh3i.mongodb.net/?retryWrites=true&w=majority&appName=blocdash`;
@@ -88,5 +90,6 @@ const main = async () => {
 	// Schedule the heartbeat function to run every hour
 	cron.schedule("* * * * *", fetchAndStoreTransactions);
 };
+export default httpServer;
 
 main().catch((error) => console.log(error));
