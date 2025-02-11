@@ -16,17 +16,18 @@ import { User } from "./entities/User";
 import { UserResolver } from "./resolvers/user";
 import { fetchAndStoreTransactions } from "./utils/fetchAndStoreTransactions";
 
-const main = async () => {
-	const AppDataSource = new DataSource({
-		type: "postgres",
-		database: "blocdash",
-		username: process.env.DB_USERNAME_DEV,
-		password: process.env.DB_PASSWORD_DEV,
-		logging: true,
-		synchronize: true,
-		entities: [User, Transaction],
-	});
+export const AppDataSource = new DataSource({
+	type: "postgres",
+	url: process.env.DATABASE_URL,
+	// database: "blocdash",
+	// username: process.env.DB_USERNAME_DEV,
+	// password: process.env.DB_PASSWORD_DEV,
+	logging: true,
+	synchronize: true,
+	entities: [User, Transaction],
+});
 
+const main = async () => {
 	AppDataSource.initialize()
 		.then(() => {
 			console.log("Database connected :", AppDataSource.options.database);
