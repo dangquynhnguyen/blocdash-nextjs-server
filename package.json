@@ -10,7 +10,9 @@
     "start-ts": "ts-node src/index.ts",
     "server-ts": "nodemon --exec ts-node src/index.ts",
     "watch": "tsc -w",
-    "typeorm:generate": "npx typeorm-ts-node-esm migration:generate src/migrations -d src/db/dataSourceProd.ts"
+    "typeorm": "ts-node ./node_modules/typeorm/cli",
+    "migration:generate": "npx typeorm-ts-node-esm migration:generate src/migrations -d src/db/dataSourceProd.ts",
+    "migration:blank": "yarn typeorm migration:create -n"
   },
   "author": "DN",
   "license": "MIT",

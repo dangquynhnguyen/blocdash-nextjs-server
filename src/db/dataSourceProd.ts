@@ -1,4 +1,7 @@
+import dotenv from "dotenv";
 import { DataSource, DataSourceOptions } from "typeorm";
+
+dotenv.config();
 
 let connectionOptions: DataSourceOptions = {
 	type: "postgres",
@@ -12,7 +15,8 @@ let connectionOptions: DataSourceOptions = {
 	dropSchema: false,
 	logging: true,
 	// logger: "file",
-	entities: ["dist/entities/*.ts"],
+	entities: ["dist/entities/*.js"],
+	migrations: ["dist/migrations/*.js"],
 	// migrations: ["src/migrations/**/*.ts"],
 	// migrationsRun: true,
 	//   subscribers: ['src/subscriber/**/*.ts'],
