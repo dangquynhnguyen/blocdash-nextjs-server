@@ -23,9 +23,13 @@ const main = async () => {
 		})
 		.catch((error) => console.log("Database", error));
 
+	if (__prod__) await AppDataSource.runMigrations();
+
 	app.use(
 		cors({
-			origin: ["http://localhost:3000", "https://blocdash-nextjs.vercel.app"],
+			origin: __prod__
+				? process.env.CORS_ORIGIN_PROD
+				: process.env.CORS_ORIGIN_DEV,
 			credentials: true,
 		})
 	);
