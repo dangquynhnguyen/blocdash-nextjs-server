@@ -1,5 +1,5 @@
 require("dotenv").config();
-import { ApolloServerPluginDrainHttpServer } from "apollo-server-core/dist/plugin/drainHttpServer";
+import { ApolloServerPluginLandingPageGraphQLPlayground } from "apollo-server-core";
 import { ApolloServer } from "apollo-server-express";
 import MongoStore from "connect-mongo";
 import cors from "cors";
@@ -74,10 +74,10 @@ const main = async () => {
 			validate: false,
 		}),
 		context: ({ req, res }) => ({ req, res }),
-		plugins: [ApolloServerPluginDrainHttpServer({ httpServer })],
+		plugins: [ApolloServerPluginLandingPageGraphQLPlayground],
 	});
 	await apolloServer.start();
-	apolloServer.applyMiddleware({ app: app as any, cors: false, path: "/" });
+	apolloServer.applyMiddleware({ app: app as any, cors: false });
 
 	const PORT = process.env.PORT || 4000;
 	app.listen(PORT, () =>
