@@ -8,7 +8,7 @@ let connectionOptions: DataSourceOptions = {
 	// username: process.env.DB_USERNAME, // postgre username
 	// password: process.env.DB_PASSWORD, // postgre password
 	// database: process.env.DB_DATABASE, // postgre db, needs to be created before
-	synchronize: true,
+	synchronize: false,
 	dropSchema: false,
 	logging: true,
 	// logger: "file",
