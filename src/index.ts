@@ -1,10 +1,11 @@
 require("dotenv").config();
-import { ApolloServerPluginLandingPageGraphQLPlayground } from "apollo-server-core";
+import { ApolloServerPluginDrainHttpServer } from "apollo-server-core/dist/plugin/drainHttpServer";
 import { ApolloServer } from "apollo-server-express";
 import MongoStore from "connect-mongo";
 import cors from "cors";
 import express, { Application } from "express";
 import session from "express-session";
+import http from "http";
 import mongoose from "mongoose";
 import cron from "node-cron";
 import "reflect-metadata";
@@ -35,6 +36,7 @@ const main = async () => {
 		.catch((error) => console.log("Database", error));
 
 	const app: Application = express();
+	const httpServer = http.createServer(app);
 	app.use(
 		cors({
 			origin: ["http://localhost:3000", "https://blocdash-nextjs.vercel.app"],
@@ -70,7 +72,7 @@ const main = async () => {
 			validate: false,
 		}),
 		context: ({ req, res }) => ({ req, res }),
-		plugins: [ApolloServerPluginLandingPageGraphQLPlayground],
+		plugins: [ApolloServerPluginDrainHttpServer({ httpServer })],
 	});
 	await apolloServer.start();
 	apolloServer.applyMiddleware({ app: app as any, cors: false });
