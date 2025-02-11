@@ -77,7 +77,7 @@ const main = async () => {
 		plugins: [ApolloServerPluginDrainHttpServer({ httpServer })],
 	});
 	await apolloServer.start();
-	apolloServer.applyMiddleware({ app: app as any, cors: false });
+	apolloServer.applyMiddleware({ app: app as any, cors: false, path: "/" });
 
 	const PORT = process.env.PORT || 4000;
 	app.listen(PORT, () =>
@@ -90,6 +90,5 @@ const main = async () => {
 	// Schedule the heartbeat function to run every hour
 	cron.schedule("* * * * *", fetchAndStoreTransactions);
 };
-export default httpServer;
 
 main().catch((error) => console.log(error));
