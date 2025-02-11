@@ -1,4 +1,5 @@
 import dotenv from "dotenv";
+import path from "path";
 import { DataSource, DataSourceOptions } from "typeorm";
 
 dotenv.config();
@@ -16,7 +17,7 @@ let connectionOptions: DataSourceOptions = {
 	},
 	ssl: true,
 	entities: ["src/entities/**/*.ts"],
-	migrations: ["src/migrations/**/*.ts"],
+	migrations: [path.join(__dirname, "/migrations/*")],
 };
 
 export default new DataSource({
