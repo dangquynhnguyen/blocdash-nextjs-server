@@ -5,31 +5,16 @@ import MongoStore from "connect-mongo";
 import cors from "cors";
 import express, { Application } from "express";
 import session from "express-session";
-import http from "http";
 import mongoose from "mongoose";
 import cron from "node-cron";
 import "reflect-metadata";
 import { buildSchema } from "type-graphql";
-import { DataSource } from "typeorm";
 import { __prod__, COOKIE_NAME } from "./constants";
-import { Transaction } from "./entities/Transaction";
-import { User } from "./entities/User";
+import AppDataSource from "./db/dataSourceProd";
 import { UserResolver } from "./resolvers/user";
 import { fetchAndStoreTransactions } from "./utils/fetchAndStoreTransactions";
 
-export const AppDataSource = new DataSource({
-	type: "postgres",
-	url: process.env.DATABASE_URL,
-	// database: "blocdash",
-	// username: process.env.DB_USERNAME_DEV,
-	// password: process.env.DB_PASSWORD_DEV,
-	logging: true,
-	synchronize: true,
-	entities: [User, Transaction],
-});
-
 const app: Application = express();
-const httpServer = http.createServer(app);
 
 const main = async () => {
 	AppDataSource.initialize()
@@ -75,6 +60,7 @@ const main = async () => {
 		}),
 		context: ({ req, res }) => ({ req, res }),
 		plugins: [ApolloServerPluginLandingPageGraphQLPlayground],
+		persistedQueries: false,
 	});
 	await apolloServer.start();
 	apolloServer.applyMiddleware({ app: app as any, cors: false });
