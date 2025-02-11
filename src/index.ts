@@ -6,13 +6,15 @@ import cors from "cors";
 import express, { Application } from "express";
 import session from "express-session";
 import mongoose from "mongoose";
+import cron from "node-cron";
 import "reflect-metadata";
 import { buildSchema } from "type-graphql";
 import { DataSource } from "typeorm";
 import { __prod__, COOKIE_NAME } from "./constants";
+import { Transaction } from "./entities/Transaction";
 import { User } from "./entities/User";
-import { HelloResolver } from "./resolvers/hello";
 import { UserResolver } from "./resolvers/user";
+import { fetchAndStoreTransactions } from "./utils/fetchAndStoreTransactions";
 
 const main = async () => {
 	const AppDataSource = new DataSource({
@@ -22,7 +24,7 @@ const main = async () => {
 		password: process.env.DB_PASSWORD_DEV,
 		logging: true,
 		synchronize: true,
-		entities: [User],
+		entities: [User, Transaction],
 	});
 
 	AppDataSource.initialize()
@@ -63,7 +65,7 @@ const main = async () => {
 
 	const apolloServer = new ApolloServer({
 		schema: await buildSchema({
-			resolvers: [HelloResolver, UserResolver],
+			resolvers: [UserResolver],
 			validate: false,
 		}),
 		context: ({ req, res }) => ({ req, res }),
@@ -78,6 +80,10 @@ const main = async () => {
 			`Server started on port ${PORT}. GraphQL server started on localhost ${PORT}${apolloServer.graphqlPath}`
 		)
 	);
+
+	//
+	// Schedule the heartbeat function to run every hour
+	cron.schedule("* * * * *", fetchAndStoreTransactions);
 };
 
 main().catch((error) => console.log(error));
