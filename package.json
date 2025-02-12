@@ -13,7 +13,8 @@
     "typeorm": "ts-node ./node_modules/typeorm/cli",
     "migration:generate": "npx typeorm-ts-node-esm migration:generate src/migrations -d src/db/dataSourceProd.ts",
     "migration:blank": "yarn typeorm migration:create -n",
-    "migration:run": "yarn typeorm migration:run -d src/db/dataSourceProd.ts"
+    "migration:run": "yarn typeorm migration:run -d src/db/dataSourceProd.ts",
+    "postinstall": "yarn add typescript"
   },
   "author": "DN",
   "license": "MIT",
