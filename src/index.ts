@@ -17,7 +17,7 @@ import { fetchAndStoreTransactions } from "./utils/fetchAndStoreTransactions";
 const app: Application = express();
 
 const main = async () => {
-	AppDataSource.initialize()
+	await AppDataSource.initialize()
 		.then(() => {
 			console.log("Database connected :", AppDataSource.options.database);
 		})
@@ -69,12 +69,12 @@ const main = async () => {
 	await apolloServer.start();
 	apolloServer.applyMiddleware({ app: app as any, cors: false });
 
-	// const PORT = process.env.PORT || 4000;
-	// app.listen(PORT, () =>
-	// 	console.log(
-	// 		`Server started on port ${PORT}. GraphQL server started on localhost ${PORT}${apolloServer.graphqlPath}`
-	// 	)
-	// );
+	const PORT = process.env.PORT || 4000;
+	app.listen(PORT, () =>
+		console.log(
+			`Server started on port ${PORT}. GraphQL server started on localhost ${PORT}${apolloServer.graphqlPath}`
+		)
+	);
 
 	//
 	// Schedule the heartbeat function to run every hour
