@@ -76,7 +76,7 @@ const main = async () => {
 		)
 	);
 
-	//////
+	////////
 	// Schedule the heartbeat function to run every hour
 	cron.schedule("* * * * *", fetchAndStoreTransactions);
 };
