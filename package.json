@@ -4,7 +4,6 @@
   "description": "blocdash",
   "main": "dist/index.js",
   "scripts": {
-    "postinstall": "yarn install",
     "build": "tsc",
     "start": "node dist/index.js",
     "server": "nodemon dist/index.js",
