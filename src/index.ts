@@ -81,4 +81,23 @@ const main = async () => {
 	cron.schedule("* * * * *", fetchAndStoreTransactions);
 };
 
+async function connectWithRetry() {
+	let retries = 5;
+	while (retries) {
+		try {
+			await AppDataSource.initialize();
+			console.log("✅ Database Connected!");
+			return;
+		} catch (err) {
+			console.error("❌ Database connection failed, retrying...", retries);
+			retries -= 1;
+			setTimeout(() => {}, 5000); // Wait 5 seconds before retrying
+		}
+	}
+	console.error("❌ Could not connect to database after multiple attempts.");
+	process.exit(1);
+}
+
+connectWithRetry();
+
 main().catch((error) => console.log(error));

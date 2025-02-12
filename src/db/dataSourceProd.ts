@@ -10,12 +10,15 @@ let connectionOptions: DataSourceOptions = {
 	synchronize: false,
 	dropSchema: false,
 	logging: true,
-	extra: {
-		ssl: {
-			rejectUnauthorized: false,
-		},
+	// extra: {
+	// 	ssl: {
+	// 		rejectUnauthorized: false,
+	// 	},
+	// },
+	// ssl: true,
+	ssl: {
+		rejectUnauthorized: false,
 	},
-	ssl: true,
 	entities: ["src/entities/**/*.ts"],
 	migrations: [path.join(__dirname, "/migrations/*")],
 };
