@@ -23,7 +23,7 @@ const main = async () => {
 		})
 		.catch((error) => console.log("Database", error));
 
-	if (__prod__) await AppDataSource.runMigrations();
+	await AppDataSource.runMigrations();
 
 	app.use(
 		cors({
