@@ -1,5 +1,4 @@
 import dotenv from "dotenv";
-import path from "path";
 import "reflect-metadata";
 import { DataSource, DataSourceOptions } from "typeorm";
 import { Transaction } from "../entities/Transaction";
@@ -10,7 +9,7 @@ dotenv.config();
 let connectionOptions: DataSourceOptions = {
 	type: "postgres",
 	url: process.env.DB_URL,
-	synchronize: false,
+	synchronize: true,
 	dropSchema: false,
 	logging: true,
 	extra: {
@@ -20,7 +19,7 @@ let connectionOptions: DataSourceOptions = {
 	},
 	ssl: true,
 	entities: [User, Transaction],
-	migrations: [path.join(__dirname, "/migrations/*")],
+	// migrations: [path.join(__dirname, "/migrations/*")],
 };
 
 export default new DataSource({
