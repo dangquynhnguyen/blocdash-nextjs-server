@@ -49,7 +49,7 @@ const main = async () => {
 				httpOnly: true, // JS front end cannot acces the cookie
 				secure: __prod__, // cookie only work in https
 				sameSite: "lax", // protection against CSRF
-				domain: __prod__ ? "https://www.blocdash.com" : undefined,
+				domain: __prod__ ? process.env.CORS_ORIGIN_PROD : undefined,
 			},
 			secret: process.env.SESSION_SECRET_DEV_PROD as string,
 			saveUninitialized: false, // don't save empty sessions, right from the start
@@ -68,7 +68,15 @@ const main = async () => {
 		introspection: true, // Autoriser l'introspection
 	});
 	await apolloServer.start();
-	apolloServer.applyMiddleware({ app: app as any, cors: false });
+	apolloServer.applyMiddleware({
+		app: app as any,
+		cors: {
+			origin: __prod__
+				? process.env.CORS_ORIGIN_PROD
+				: process.env.CORS_ORIGIN_DEV,
+			credentials: true,
+		},
+	});
 
 	const PORT = process.env.PORT || 4000;
 	app.listen(PORT, () =>
