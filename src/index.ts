@@ -65,6 +65,7 @@ const main = async () => {
 		context: ({ req, res }) => ({ req, res }),
 		plugins: [ApolloServerPluginLandingPageGraphQLPlayground],
 		persistedQueries: false,
+		introspection: true, // Autoriser l'introspection
 	});
 	await apolloServer.start();
 	apolloServer.applyMiddleware({ app: app as any, cors: false });
