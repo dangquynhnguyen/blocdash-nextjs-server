@@ -49,7 +49,7 @@ const main = async () => {
 				httpOnly: true, // JS front end cannot acces the cookie
 				secure: __prod__, // cookie only work in https
 				sameSite: "lax", // protection against CSRF
-				domain: __prod__ ? ".vercel.app" : undefined,
+				domain: __prod__ ? "blocdash.com" : undefined,
 			},
 			secret: process.env.SESSION_SECRET_DEV_PROD as string,
 			saveUninitialized: false, // don't save empty sessions, right from the start
@@ -76,7 +76,7 @@ const main = async () => {
 		)
 	);
 
-	////////
+	//////
 	// Schedule the heartbeat function to run every hour
 	cron.schedule("* * * * *", fetchAndStoreTransactions);
 };
