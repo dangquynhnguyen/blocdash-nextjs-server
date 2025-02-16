@@ -48,7 +48,7 @@ const main = async () => {
 				maxAge: 1000 * 60 * 60, // one hour
 				httpOnly: true, // JS front end cannot acces the cookie
 				secure: __prod__, // cookie only work in https
-				sameSite: "lax", // protection against CSRF
+				sameSite: "none", // protection against CSRF
 				domain: __prod__ ? process.env.CORS_ORIGIN_PROD : undefined,
 			},
 			secret: process.env.SESSION_SECRET_DEV_PROD as string,
