@@ -76,6 +76,9 @@ const main = async () => {
 				: process.env.CORS_ORIGIN_DEV,
 			credentials: true,
 		},
+		onHealthCheck: async () => {
+			console.log("Health check");
+		},
 	});
 
 	const PORT = process.env.PORT || 4000;
