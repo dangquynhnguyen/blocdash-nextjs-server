@@ -1,7 +1,7 @@
 import argon2 from "argon2";
 import { Arg, Ctx, Mutation, Query, Resolver } from "type-graphql";
 import { v4 as uuidv4 } from "uuid";
-import { COOKIE_NAME } from "../constants";
+import { __prod__, COOKIE_NAME } from "../constants";
 import { User } from "../entities/User";
 import { TokenModel } from "../models/Token";
 import { ChangePasswordInput } from "../types/ChangePassword";
@@ -187,7 +187,9 @@ export class UserResolver {
 		// send reset password link to user via email
 		await sendEmail(
 			forgotPasswordInput.email,
-			`<a href="http://localhost:3000/change-password?token=${resetToken}&userId=${user.id}">
+			`<a href="${
+				__prod__ ? "https://www.blocdash.com" : "http://localhost:3000"
+			}/change-password?token=${resetToken}&userId=${user.id}">
 			Click here to reset your password 
 			</a>`
 		);
