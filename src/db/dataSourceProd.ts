@@ -1,4 +1,5 @@
 import dotenv from "dotenv";
+import path from "path";
 import "reflect-metadata";
 import { DataSource, DataSourceOptions } from "typeorm";
 import { Transaction } from "../entities/Transaction";
@@ -19,7 +20,7 @@ let connectionOptions: DataSourceOptions = {
 	},
 	ssl: true,
 	entities: [User, Transaction],
-	// migrations: [path.join(__dirname, "/migrations/*")],
+	migrations: [path.join(__dirname, "/migrations/*")],
 };
 
 export default new DataSource({

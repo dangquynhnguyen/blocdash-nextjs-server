@@ -23,7 +23,7 @@ const main = async () => {
 		})
 		.catch((error) => console.log("Database", error));
 
-	// await AppDataSource.runMigrations();
+	await AppDataSource.runMigrations();
 
 	app.use(
 		cors({
@@ -51,7 +51,6 @@ const main = async () => {
 				httpOnly: true, // JS front end cannot acces the cookie
 				secure: __prod__, // cookie only work in https
 				sameSite: "none", // protection against CSRF
-				// domain: __prod__ ? process.env.CORS_ORIGIN_PROD : undefined,
 			},
 			secret: process.env.SESSION_SECRET_DEV_PROD as string,
 			saveUninitialized: false, // don't save empty sessions, right from the start
@@ -66,8 +65,6 @@ const main = async () => {
 		}),
 		context: ({ req, res }) => ({ req, res }),
 		plugins: [ApolloServerPluginLandingPageGraphQLPlayground],
-		// persistedQueries: false,
-		// introspection: true, // Autoriser l'introspection
 	});
 	await apolloServer.start();
 	apolloServer.applyMiddleware({
