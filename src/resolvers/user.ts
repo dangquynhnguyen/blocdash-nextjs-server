@@ -188,7 +188,7 @@ export class UserResolver {
 		await sendEmail(
 			forgotPasswordInput.email,
 			`<a href="${
-				__prod__ ? "https://www.blocdash.com" : "http://localhost:3000"
+				__prod__ ? process.env.CORS_ORIGIN_PROD : process.env.CORS_ORIGIN_DEV
 			}/change-password?token=${resetToken}&userId=${user.id}">
 			Click here to reset your password 
 			</a>`
