@@ -40,6 +40,8 @@ const main = async () => {
 	await mongoose.connect(mongoUrl);
 	console.log("MongoDB connected");
 
+	app.set("trust proxy", 1);
+
 	app.use(
 		session({
 			name: COOKIE_NAME,
@@ -48,8 +50,8 @@ const main = async () => {
 				maxAge: 1000 * 60 * 60, // one hour
 				httpOnly: true, // JS front end cannot acces the cookie
 				secure: __prod__, // cookie only work in https
-				sameSite: "lax", // protection against CSRF
-				domain: __prod__ ? process.env.CORS_ORIGIN_PROD : undefined,
+				sameSite: "none", // protection against CSRF
+				// domain: __prod__ ? process.env.CORS_ORIGIN_PROD : undefined,
 			},
 			secret: process.env.SESSION_SECRET_DEV_PROD as string,
 			saveUninitialized: false, // don't save empty sessions, right from the start
@@ -75,9 +77,6 @@ const main = async () => {
 				? process.env.CORS_ORIGIN_PROD
 				: process.env.CORS_ORIGIN_DEV,
 			credentials: true,
-		},
-		onHealthCheck: async () => {
-			console.log("Health check");
 		},
 	});
 
