@@ -187,16 +187,6 @@ export class UserResolver {
 			token: hashedResetToken,
 		}).save();
 
-		// send reset password link to user via email
-		// await sendEmail(
-		// 	forgotPasswordInput.email,
-		// 	`<a href="${
-		// 		__prod__ ? process.env.CORS_ORIGIN_PROD : process.env.CORS_ORIGIN_DEV
-		// 	}/change-password?token=${resetToken}&userId=${user.id}">
-		// 	Click here to reset your password
-		// 	</a>`
-		// );
-
 		const url = `${
 			__prod__ ? process.env.CORS_ORIGIN_PROD : process.env.CORS_ORIGIN_DEV
 		}/change-password?token=${resetToken}&userId=${user.id}`;

@@ -1,5 +1,6 @@
 import { getModelForClass, prop } from "@typegoose/typegoose";
 import mongoose from "mongoose";
+import { RESET_PASSWORD_TOKEN_EXPIRES } from "../constants";
 
 export class Token {
 	_id!: mongoose.Types.ObjectId;
@@ -10,7 +11,7 @@ export class Token {
 	@prop({ required: true })
 	token!: string;
 
-	@prop({ default: Date.now, expires: 60 * 5 })
+	@prop({ default: Date.now, expires: RESET_PASSWORD_TOKEN_EXPIRES })
 	createdAt: Date;
 }
 

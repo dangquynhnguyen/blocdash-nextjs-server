@@ -8,12 +8,12 @@ import {
 	Heading,
 	Hr,
 	Html,
-	Img,
 	Preview,
 	Section,
 	Text,
 } from "@react-email/components";
 import React from "react";
+import { RESET_PASSWORD_TOKEN_EXPIRES } from "../constants";
 
 interface ChangePasswordProps {
 	url: string;
@@ -29,12 +29,7 @@ export default function ChangePassword({ url, toMail }: ChangePasswordProps) {
 				<Container style={container}>
 					<Section style={coverSection}>
 						<Section style={imageSection}>
-							<Img
-								src="/dist/public/logo.png"
-								width="75"
-								height="45"
-								alt="Logo"
-							/>
+							<img src="cid:logo" width="45" height="45" alt="Logo" />
 						</Section>
 						<Section style={upperSection}>
 							<Heading style={h1}>Reset your password</Heading>
@@ -49,7 +44,8 @@ export default function ChangePassword({ url, toMail }: ChangePasswordProps) {
 									Reset password
 								</Button>
 								<Text style={validityText}>
-									(This link is valid for 10 minutes)
+									(This link is valid for {RESET_PASSWORD_TOKEN_EXPIRES / 60}{" "}
+									minutes)
 								</Text>
 							</Section>
 						</Section>
