@@ -7,7 +7,6 @@ import {
 	Typography,
 } from "@mui/material";
 import React from "react";
-import logo from "../public/logo.svg";
 import { colors } from "../theme";
 
 type Props = {
@@ -31,7 +30,7 @@ export default function ChangePassword(props: Props) {
 				}}
 			>
 				<Box maxWidth={600} rowGap={500}>
-					<img src={logo} alt="Blocdash" height={50}></img>
+					<img src="../public/logo.svg" alt="Blocdash" height={50}></img>
 					<Typography p="1.5rem 0" fontSize="1.3rem" fontWeight={550}>
 						Reset your password
 					</Typography>
