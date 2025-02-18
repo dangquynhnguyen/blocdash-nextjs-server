@@ -1,8 +1,11 @@
+import { render } from "@react-email/render";
 import argon2 from "argon2";
+import { createElement } from "react";
 import { Arg, Ctx, Mutation, Query, Resolver } from "type-graphql";
 import { v4 as uuidv4 } from "uuid";
 import { __prod__, COOKIE_NAME } from "../constants";
 import { User } from "../entities/User";
+import ChangePassword from "../mailComponents/ChangePassword";
 import { TokenModel } from "../models/Token";
 import { ChangePasswordInput } from "../types/ChangePassword";
 import { Context } from "../types/Context";
@@ -10,7 +13,6 @@ import { ForgotPasswordInput } from "../types/ForgotPassword";
 import { LoginInput } from "../types/LoginInput";
 import { RegisterInput } from "../types/RegisterInput";
 import { UserMutationResponse } from "../types/UserMutationResponse";
-import { renderChangePasswordEmail } from "../utils/renderChangePasswordEmail";
 import { sendEmail } from "../utils/sendEmail";
 import { validateRegisterInput } from "../utils/validateRegisterInput";
 
@@ -198,11 +200,14 @@ export class UserResolver {
 		const url = `${
 			__prod__ ? process.env.CORS_ORIGIN_PROD : process.env.CORS_ORIGIN_DEV
 		}/change-password?token=${resetToken}&userId=${user.id}`;
-		const emailContent = renderChangePasswordEmail(
-			forgotPasswordInput.email,
-			url
+
+		const emailHtml = await render(
+			createElement(ChangePassword, {
+				url: url,
+				toMail: forgotPasswordInput.email,
+			})
 		);
-		await sendEmail(forgotPasswordInput.email, emailContent);
+		await sendEmail(forgotPasswordInput.email, emailHtml);
 		return true;
 	}
 

@@ -1,67 +1,147 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable react/no-unescaped-entities */
 import {
-	Box,
+	Body,
 	Button,
-	createTheme,
-	ThemeProvider,
-	Typography,
-} from "@mui/material";
+	Container,
+	Head,
+	Heading,
+	Hr,
+	Html,
+	Img,
+	Preview,
+	Section,
+	Text,
+} from "@react-email/components";
 import React from "react";
-import { colors } from "../theme";
 
-type Props = {
-	to: string;
+interface ChangePasswordProps {
 	url: string;
-};
+	toMail: string;
+}
 
-const theme = createTheme({
-	palette: {
-		primary: colors.logo,
-	},
-});
-
-export default function ChangePassword(props: Props) {
+export default function ChangePassword({ url, toMail }: ChangePasswordProps) {
 	return (
-		<ThemeProvider theme={theme}>
-			<Box
-				sx={{
-					display: "flex",
-					justifyContent: "center",
-				}}
-			>
-				<Box maxWidth={600} rowGap={500}>
-					<img src="../public/logo.svg" alt="Blocdash" height={50}></img>
-					<Typography p="1.5rem 0" fontSize="1.3rem" fontWeight={550}>
-						Reset your password
-					</Typography>
-					<Typography color={colors.primary[500]}>
-						We've received a request to reset the password for the Blocdash
-						account associated with
-						{<link href={"mailto:" + props.to}> {props.to}</link>}. No changes
-						have been made to your account yet. To reset your password, click on
-						the button below.
-					</Typography>
-					<Button
-						href={props.url}
-						variant="contained"
-						color="primary"
-						size="small"
-						sx={{
-							m: "1.5rem 0",
-							p: "0.25rem 1rem",
-						}}
-					>
-						Reset your password
-					</Button>
-					<Typography color={colors.primary[500]}>
-						If you didn't request for a password reset, you can safely ignore
-						this email.
-					</Typography>
-					<Typography color={colors.primary[800]} mt="2rem" fontSize="0.8rem">
-						This message was sent from Blocdash.com
-					</Typography>
-				</Box>
-			</Box>
-		</ThemeProvider>
+		<Html>
+			<Head />
+			<Body style={main}>
+				<Preview>Reset your password</Preview>
+				<Container style={container}>
+					<Section style={coverSection}>
+						<Section style={imageSection}>
+							<Img
+								src="/dist/public/logo.png"
+								width="75"
+								height="45"
+								alt="Logo"
+							/>
+						</Section>
+						<Section style={upperSection}>
+							<Heading style={h1}>Reset your password</Heading>
+							<Text style={mainText}>
+								We've received a request to reset the password for the Blocdash
+								account associated with {toMail}. No changes have been made to
+								your account yet. To reset your password, click on the button
+								below.
+							</Text>
+							<Section style={verificationSection}>
+								<Button style={button} href={url}>
+									Reset password
+								</Button>
+								<Text style={validityText}>
+									(This link is valid for 10 minutes)
+								</Text>
+							</Section>
+						</Section>
+						<Hr />
+						<Section style={lowerSection}>
+							<Text style={cautionText}>
+								Blocdash will never email you and ask you to disclose or verify
+								your password, credit card, or banking account number.
+							</Text>
+						</Section>
+					</Section>
+					<Text style={footerText}>
+						This message was produced and distributed by Blocdash.com
+					</Text>
+				</Container>
+			</Body>
+		</Html>
 	);
 }
+
+const main = {
+	backgroundColor: "#fff",
+	color: "#212121",
+};
+
+const container = {
+	padding: "20px",
+	margin: "0 auto",
+	backgroundColor: "#eee",
+};
+
+const h1 = {
+	color: "#333",
+	fontFamily:
+		"-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif",
+	fontSize: "20px",
+	fontWeight: "bold",
+	marginBottom: "15px",
+};
+
+const text = {
+	color: "#333",
+	fontFamily:
+		"-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif",
+	fontSize: "14px",
+	margin: "24px 0",
+};
+
+const button = {
+	backgroundColor: "#ff621a",
+	borderRadius: "4px",
+	color: "#fff",
+	fontFamily: "'Open Sans', 'Helvetica Neue', Arial",
+	fontSize: "15px",
+	textDecoration: "none",
+	textAlign: "center" as const,
+	display: "block",
+	width: "210px",
+	padding: "14px 7px",
+};
+
+const imageSection = {
+	display: "flex",
+	padding: "1.5rem 0 0 1.25rem",
+	alignItems: "center",
+	justifyContent: "left",
+};
+
+const coverSection = { backgroundColor: "#fff" };
+
+const upperSection = { padding: "25px 35px" };
+
+const lowerSection = { padding: "25px 35px" };
+
+const footerText = {
+	...text,
+	fontSize: "12px",
+	padding: "0 20px",
+};
+
+const validityText = {
+	...text,
+	margin: "0px",
+	textAlign: "center" as const,
+};
+
+const verificationSection = {
+	display: "flex",
+	alignItems: "center",
+	justifyContent: "center",
+};
+
+const mainText = { ...text, marginBottom: "14px" };
+
+const cautionText = { ...text, margin: "0px" };
