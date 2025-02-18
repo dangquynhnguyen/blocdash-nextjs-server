@@ -3,12 +3,12 @@ import nodemailer from "nodemailer";
 // async..await is not allowed in global scope, must use a wrapper
 export async function sendEmail(to: string, html: string) {
 	const transporter = nodemailer.createTransport({
-		host: "smtp.ethereal.email",
-		port: 587,
-		secure: false, // true for port 465, false for other ports
+		host: "mail.privateemail.com",
+		port: 465,
+		secure: true, // true for port 465, false for other ports
 		auth: {
-			user: "maddison53@ethereal.email",
-			pass: "jn7jnAPss4f63QBp6D",
+			user: process.env.EMAIL_USER,
+			pass: process.env.EMAIL_PASSWORD,
 		},
 		tls: {
 			rejectUnauthorized: false, // avoid NodeJs self signed certificate error
