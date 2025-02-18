@@ -10,6 +10,7 @@ import { ForgotPasswordInput } from "../types/ForgotPassword";
 import { LoginInput } from "../types/LoginInput";
 import { RegisterInput } from "../types/RegisterInput";
 import { UserMutationResponse } from "../types/UserMutationResponse";
+import { renderChangePasswordEmail } from "../utils/renderChangePasswordEmail";
 import { sendEmail } from "../utils/sendEmail";
 import { validateRegisterInput } from "../utils/validateRegisterInput";
 
@@ -185,14 +186,23 @@ export class UserResolver {
 		}).save();
 
 		// send reset password link to user via email
-		await sendEmail(
+		// await sendEmail(
+		// 	forgotPasswordInput.email,
+		// 	`<a href="${
+		// 		__prod__ ? process.env.CORS_ORIGIN_PROD : process.env.CORS_ORIGIN_DEV
+		// 	}/change-password?token=${resetToken}&userId=${user.id}">
+		// 	Click here to reset your password
+		// 	</a>`
+		// );
+
+		const url = `${
+			__prod__ ? process.env.CORS_ORIGIN_PROD : process.env.CORS_ORIGIN_DEV
+		}/change-password?token=${resetToken}&userId=${user.id}`;
+		const emailContent = renderChangePasswordEmail(
 			forgotPasswordInput.email,
-			`<a href="${
-				__prod__ ? process.env.CORS_ORIGIN_PROD : process.env.CORS_ORIGIN_DEV
-			}/change-password?token=${resetToken}&userId=${user.id}">
-			Click here to reset your password 
-			</a>`
+			url
 		);
+		await sendEmail(forgotPasswordInput.email, emailContent);
 		return true;
 	}
 

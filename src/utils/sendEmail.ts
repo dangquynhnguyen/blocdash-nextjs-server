@@ -17,9 +17,9 @@ export async function sendEmail(to: string, html: string) {
 
 	// send mail with defined transport object
 	const info = await transporter.sendMail({
-		from: '"Blocdash admin 👻" <admin@blocdash.com>', // sender address
+		from: '"Blocdash Support" <admin@blocdash.com>', // sender address
 		to, // list of receivers
-		subject: "Change Password", // Subject line
+		subject: "Reset your password", // Subject line
 		html, // html body
 	});
 
