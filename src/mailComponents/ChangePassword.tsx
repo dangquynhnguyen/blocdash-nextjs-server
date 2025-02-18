@@ -8,6 +8,7 @@ import {
 	Heading,
 	Hr,
 	Html,
+	Link,
 	Preview,
 	Section,
 	Text,
@@ -58,7 +59,8 @@ export default function ChangePassword({ url, toMail }: ChangePasswordProps) {
 						</Section>
 					</Section>
 					<Text style={footerText}>
-						This message was produced and distributed by Blocdash.com
+						This message was produced and distributed by{" "}
+						<Link href="https://www.blocdash.com">Blocdash.com</Link>
 					</Text>
 				</Container>
 			</Body>
@@ -109,7 +111,7 @@ const button = {
 
 const imageSection = {
 	display: "flex",
-	padding: "1.5rem 0 0 1.25rem",
+	padding: "35px 0 0 35px",
 	alignItems: "center",
 	justifyContent: "left",
 };
