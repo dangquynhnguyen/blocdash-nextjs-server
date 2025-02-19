@@ -16,12 +16,12 @@ import {
 import React from "react";
 import { RESET_PASSWORD_TOKEN_EXPIRES } from "../constants";
 
-interface ChangePasswordProps {
+interface ResetPasswordProps {
 	url: string;
 	toMail: string;
 }
 
-export default function ChangePassword({ url, toMail }: ChangePasswordProps) {
+export default function ResetPassword({ url, toMail }: ResetPasswordProps) {
 	return (
 		<Html>
 			<Head />

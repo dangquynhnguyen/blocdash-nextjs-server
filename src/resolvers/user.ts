@@ -5,7 +5,8 @@ import { Arg, Ctx, Mutation, Query, Resolver } from "type-graphql";
 import { v4 as uuidv4 } from "uuid";
 import { __prod__, COOKIE_NAME } from "../constants";
 import { User } from "../entities/User";
-import ChangePassword from "../mailComponents/ChangePassword";
+import ResetPassword from "../mail/ResetPassword";
+import Welcome from "../mail/Welcome";
 import { TokenModel } from "../models/Token";
 import { ChangePasswordInput } from "../types/ChangePassword";
 import { Context } from "../types/Context";
@@ -66,6 +67,9 @@ export class UserResolver {
 
 			newUser = await User.save(newUser);
 			req.session.userId = newUser.id;
+
+			const emailHtml = await render(createElement(Welcome));
+			await sendEmail(newUser.email, emailHtml, "Welcome to Blocdash");
 
 			return {
 				code: 200,
@@ -192,12 +196,16 @@ export class UserResolver {
 		}/change-password?token=${resetToken}&userId=${user.id}`;
 
 		const emailHtml = await render(
-			createElement(ChangePassword, {
+			createElement(ResetPassword, {
 				url: url,
 				toMail: forgotPasswordInput.email,
 			})
 		);
-		await sendEmail(forgotPasswordInput.email, emailHtml);
+		await sendEmail(
+			forgotPasswordInput.email,
+			emailHtml,
+			"Reset your password"
+		);
 		return true;
 	}
 

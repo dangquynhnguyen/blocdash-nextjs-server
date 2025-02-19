@@ -3,7 +3,7 @@ import path from "path";
 var inlineBase64 = require("nodemailer-plugin-inline-base64");
 
 // async..await is not allowed in global scope, must use a wrapper
-export async function sendEmail(to: string, html: string) {
+export async function sendEmail(to: string, html: string, title: string) {
 	const transporter = nodemailer.createTransport({
 		host: "mail.privateemail.com",
 		port: 465,
@@ -23,7 +23,7 @@ export async function sendEmail(to: string, html: string) {
 	const info = await transporter.sendMail({
 		from: '"Blocdash Support" <noreply@blocdash.com>', // sender address
 		to, // list of receivers
-		subject: "Reset your password", // Subject line
+		subject: title, // Subject line
 		html, // html body
 		attachDataUrls: true,
 		attachments: [
