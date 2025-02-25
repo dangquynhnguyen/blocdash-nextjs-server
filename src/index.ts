@@ -27,7 +27,7 @@ const main = async () => {
 
 	app.use(
 		cors({
-			origin: "*",
+			origin: ["https://www.blocdash.com", "10.6.60.66"],
 			credentials: true,
 		})
 	);
