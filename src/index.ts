@@ -28,7 +28,8 @@ const main = async () => {
 	app.use(
 		cors({
 			origin: [
-				process.env.CORS_ORIGIN_PROD || process.env.CORS_ORIGIN_DEV || "",
+				process.env.CORS_ORIGIN_PROD || "",
+				process.env.CORS_ORIGIN_DEV || "",
 			],
 			credentials: true,
 		})
@@ -71,7 +72,8 @@ const main = async () => {
 		app: app as any,
 		cors: {
 			origin: [
-				process.env.CORS_ORIGIN_PROD || process.env.CORS_ORIGIN_DEV || "",
+				process.env.CORS_ORIGIN_PROD || "",
+				process.env.CORS_ORIGIN_DEV || "",
 			],
 			credentials: true,
 		},
