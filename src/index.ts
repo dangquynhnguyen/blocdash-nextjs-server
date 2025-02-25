@@ -27,7 +27,7 @@ const main = async () => {
 
 	app.use(
 		cors({
-			origin: ["https://www.blocdash.com", "http://localhost:3000"],
+			origin: "*",
 			credentials: true,
 		})
 	);
