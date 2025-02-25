@@ -27,7 +27,9 @@ const main = async () => {
 
 	app.use(
 		cors({
-			origin: ["https://www.blocdash.com", "http://10.6.60.66:3000"],
+			origin: [
+				process.env.CORS_ORIGIN_PROD || process.env.CORS_ORIGIN_DEV || "",
+			],
 			credentials: true,
 		})
 	);
@@ -68,9 +70,9 @@ const main = async () => {
 	apolloServer.applyMiddleware({
 		app: app as any,
 		cors: {
-			origin: __prod__
-				? process.env.CORS_ORIGIN_PROD
-				: process.env.CORS_ORIGIN_DEV,
+			origin: [
+				process.env.CORS_ORIGIN_PROD || process.env.CORS_ORIGIN_DEV || "",
+			],
 			credentials: true,
 		},
 	});
