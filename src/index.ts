@@ -90,7 +90,7 @@ const main = async () => {
 	//////
 	// Schedule the heartbeat function to run every hour
 	cron.schedule("* * * * *", fetchAndStoreTransactions);
-	cron.schedule("* * * * *", fetchAndStoreOldTransactions);
+	cron.schedule("30 * * * * *", fetchAndStoreOldTransactions);
 };
 
 main().catch((error) => console.log(error));
