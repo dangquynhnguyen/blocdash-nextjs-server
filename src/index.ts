@@ -12,6 +12,7 @@ import { buildSchema } from "type-graphql";
 import { __prod__, COOKIE_NAME } from "./constants";
 import AppDataSource from "./db/dataSourceProd";
 import { UserResolver } from "./resolvers/user";
+import { fetchAndStoreOldTransactions } from "./utils/fetchAndStoreOldTransactions";
 import { fetchAndStoreTransactions } from "./utils/fetchAndStoreTransactions";
 
 const app: Application = express();
@@ -89,6 +90,7 @@ const main = async () => {
 	//////
 	// Schedule the heartbeat function to run every hour
 	cron.schedule("* * * * *", fetchAndStoreTransactions);
+	cron.schedule("* * * * *", fetchAndStoreOldTransactions);
 };
 
 main().catch((error) => console.log(error));

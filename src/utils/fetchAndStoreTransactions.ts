@@ -1,11 +1,11 @@
 import axios from "axios";
-import { LEDGER_API_URL } from "../constants";
+import { URL_LEDGER_API_TRANSACTIONS_V1 } from "../constants";
 import { Transaction } from "../entities/Transaction";
 import { parseRawTransaction, RawTransaction } from "./parseRawTransaction";
 
 export const fetchAndStoreTransactions = async () => {
 	try {
-		const response = await axios.get(LEDGER_API_URL);
+		const response = await axios.get(URL_LEDGER_API_TRANSACTIONS_V1);
 		const transactions: RawTransaction[] = response.data.blocks;
 
 		//
