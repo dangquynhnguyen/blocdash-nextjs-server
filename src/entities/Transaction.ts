@@ -3,8 +3,8 @@ import { Field, ID, ObjectType } from "type-graphql";
 import { BaseEntity, Column, Entity, Index, PrimaryColumn } from "typeorm";
 
 @ObjectType()
-@Index("idx_to_created_at", ["to_account_identifier", "created_at"])
-@Index("idx_from_created_at", ["from_account_identifier", "created_at"])
+@Index("tx_idx_to_created_at", ["to_account_identifier", "created_at"])
+@Index("tx_idx_from_created_at", ["from_account_identifier", "created_at"])
 @Entity()
 export class Transaction extends BaseEntity {
 	@Field((_type) => ID)
