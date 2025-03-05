@@ -48,7 +48,7 @@ export function parseRawTransaction(
 		allowance: parseAmount(rawTx.allowance),
 		expected_allowance: parseAmount(rawTx.expected_allowance),
 
-		// Kiểm tra expires_at, nếu có thì cũng nhân 1000
+		/// Kiểm tra expires_at, nếu có thì cũng nhân 1000
 		expires_at: rawTx.expires_at ? new Date(rawTx.expires_at * 1000) : null,
 	};
 }
