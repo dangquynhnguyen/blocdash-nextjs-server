@@ -12,43 +12,43 @@ export class OldTransaction extends BaseEntity {
 	block_height: number;
 
 	@Field()
-	@Column()
+	@Column({ length: 64, type: "char" })
 	parent_hash: string;
 
 	@Field()
-	@Column()
+	@Column({ length: 64, type: "char" })
 	block_hash: string;
 
 	@Field()
-	@Column()
+	@Column({ length: 64, type: "char" })
 	transaction_hash: string;
 
 	@Field()
-	@Column({ nullable: true })
+	@Column({ length: 64, type: "char", nullable: true })
 	from_account_identifier: string;
 
 	@Field()
-	@Column({ nullable: true })
+	@Column({ length: 64, type: "char", nullable: true })
 	to_account_identifier: string;
 
 	@Field()
-	@Column({ nullable: true })
+	@Column({ length: 64, type: "char", nullable: true })
 	spender_account_identifier: string;
 
 	@Field()
-	@Column()
+	@Column({ length: 10 }) // Enum-like: TRANSFER, MINT, BURN, etc
 	transfer_type: string;
 
 	@Field((_type) => Number, { nullable: true })
-	@Column("decimal", { nullable: true })
+	@Column("numeric", { precision: 38, scale: 8, nullable: true })
 	amount: number;
 
 	@Field((_type) => Number, { nullable: true })
-	@Column("decimal", { nullable: true })
+	@Column("numeric", { precision: 38, scale: 8, nullable: true })
 	fee: number;
 
 	@Field()
-	@Column()
+	@Column({ type: "text", nullable: true })
 	memo: string;
 
 	@Field()
@@ -56,11 +56,11 @@ export class OldTransaction extends BaseEntity {
 	created_at: Date;
 
 	@Field((_type) => Number, { nullable: true })
-	@Column("decimal", { nullable: true })
+	@Column("numeric", { precision: 38, scale: 8, nullable: true })
 	allowance: number;
 
 	@Field((_type) => Number, { nullable: true })
-	@Column("decimal", { nullable: true })
+	@Column("numeric", { precision: 38, scale: 8, nullable: true })
 	expected_allowance: number;
 
 	@Field((_type) => Date, { nullable: true })
@@ -68,6 +68,6 @@ export class OldTransaction extends BaseEntity {
 	expires_at: Date | null;
 
 	@Field()
-	@Column({ nullable: true })
+	@Column({ type: "text", nullable: true })
 	icrc1_memo: string;
 }
