@@ -13,6 +13,7 @@ import { __prod__, COOKIE_NAME } from "./constants";
 import AppDataSource from "./db/dataSourceProd";
 import { UserResolver } from "./resolvers/user";
 import { fetchAndStoreTransactions } from "./utils/fetchAndStoreTransactions";
+import { updateAccountBalances } from "./utils/updateAccountHourlyBalance";
 
 const app: Application = express();
 
@@ -89,6 +90,7 @@ const main = async () => {
 	//////
 	// Schedule the heartbeat function to run every hour
 	cron.schedule("30 * * * * *", fetchAndStoreTransactions);
+	cron.schedule("* * * * *", updateAccountBalances);
 };
 
 main().catch((error) => console.log(error));

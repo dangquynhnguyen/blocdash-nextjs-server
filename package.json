@@ -47,6 +47,7 @@
     "class-validator": "^0.14.1",
     "connect-mongo": "^5.1.0",
     "cors": "^2.8.5",
+    "date-fns": "^4.1.0",
     "dotenv": "^16.4.7",
     "express": "^4.17.1",
     "express-session": "^1.18.1",

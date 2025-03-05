@@ -2,6 +2,7 @@ import dotenv from "dotenv";
 import path from "path";
 import "reflect-metadata";
 import { DataSource, DataSourceOptions } from "typeorm";
+import { AccountHourlyBalance } from "../entities/AccountHourlyBalance";
 import { Transaction } from "../entities/Transaction";
 import { User } from "../entities/User";
 
@@ -20,7 +21,7 @@ let connectionOptions: DataSourceOptions = {
 	// },
 	// ssl: true,
 	ssl: false,
-	entities: [User, Transaction],
+	entities: [User, Transaction, AccountHourlyBalance],
 	migrations: [path.join(path.dirname(__dirname), "/migrations/*")],
 	migrationsTableName: "migrations",
 };
