@@ -1,4 +1,4 @@
-import { Transaction } from "../entities/Transaction";
+import { OldTransaction } from "../entities/OldTransaction";
 
 export type RawTransaction = {
 	block_height: string;
@@ -21,7 +21,7 @@ export type RawTransaction = {
 
 export function parseRawTransaction(
 	rawTx: RawTransaction
-): Partial<Transaction> {
+): Partial<OldTransaction> {
 	const parseAmount = (value: string | null | undefined): number | null => {
 		if (!value) return null;
 		const parsed = parseFloat(value);
@@ -42,7 +42,6 @@ export function parseRawTransaction(
 		amount: parseAmount(rawTx.amount),
 		fee: parseAmount(rawTx.fee),
 
-		memo: rawTx.memo,
 		// API trả về created_at là số giây => nhân 1000 để ra milliseconds
 		created_at: new Date(rawTx.created_at * 1000),
 
@@ -51,6 +50,5 @@ export function parseRawTransaction(
 
 		// Kiểm tra expires_at, nếu có thì cũng nhân 1000
 		expires_at: rawTx.expires_at ? new Date(rawTx.expires_at * 1000) : null,
-		icrc1_memo: rawTx.icrc1_memo,
 	};
 }

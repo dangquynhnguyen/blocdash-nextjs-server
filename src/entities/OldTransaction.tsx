@@ -41,15 +41,11 @@ export class OldTransaction extends BaseEntity {
 
 	@Field((_type) => Number, { nullable: true })
 	@Column("numeric", { precision: 38, scale: 8, nullable: true })
-	amount: number;
+	amount: number | null;
 
 	@Field((_type) => Number, { nullable: true })
 	@Column("numeric", { precision: 38, scale: 8, nullable: true })
-	fee: number;
-
-	@Field()
-	@Column({ type: "text", nullable: true })
-	memo: string;
+	fee: number | null;
 
 	@Field()
 	@Column()
@@ -57,17 +53,13 @@ export class OldTransaction extends BaseEntity {
 
 	@Field((_type) => Number, { nullable: true })
 	@Column("numeric", { precision: 38, scale: 8, nullable: true })
-	allowance: number;
+	allowance: number | null;
 
 	@Field((_type) => Number, { nullable: true })
 	@Column("numeric", { precision: 38, scale: 8, nullable: true })
-	expected_allowance: number;
+	expected_allowance: number | null;
 
 	@Field((_type) => Date, { nullable: true })
 	@Column({ type: "timestamp", nullable: true })
 	expires_at: Date | null;
-
-	@Field()
-	@Column({ type: "text", nullable: true })
-	icrc1_memo: string;
 }
