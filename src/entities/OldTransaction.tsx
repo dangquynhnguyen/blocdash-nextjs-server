@@ -12,7 +12,7 @@ export class OldTransaction extends BaseEntity {
 	block_height: number;
 
 	@Field()
-	@Column({ length: 64, type: "char" })
+	@Column({ length: 64, type: "char", nullable: true })
 	parent_hash: string;
 
 	@Field()
