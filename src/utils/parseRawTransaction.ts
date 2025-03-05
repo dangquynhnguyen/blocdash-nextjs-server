@@ -22,6 +22,12 @@ export type RawTransaction = {
 export function parseRawTransaction(
 	rawTx: RawTransaction
 ): Partial<Transaction> {
+	const parseAmount = (value: string | null | undefined): number | null => {
+		if (!value) return null;
+		const parsed = parseFloat(value);
+		return isNaN(parsed) ? null : parsed / 100000000;
+	};
+
 	return {
 		block_height: parseFloat(rawTx.block_height),
 		parent_hash: rawTx.parent_hash,
@@ -33,15 +39,15 @@ export function parseRawTransaction(
 		transfer_type: rawTx.transfer_type,
 
 		// Chuyển amount & fee từ đơn vị gốc sang đơn vị chuẩn
-		amount: parseFloat(rawTx.amount) / 100000000,
-		fee: parseFloat(rawTx.fee) / 100000000,
+		amount: parseAmount(rawTx.amount),
+		fee: parseAmount(rawTx.fee),
 
 		memo: rawTx.memo,
 		// API trả về created_at là số giây => nhân 1000 để ra milliseconds
 		created_at: new Date(rawTx.created_at * 1000),
 
-		allowance: parseFloat(rawTx.allowance) / 100000000,
-		expected_allowance: parseFloat(rawTx.expected_allowance) / 100000000,
+		allowance: parseAmount(rawTx.allowance),
+		expected_allowance: parseAmount(rawTx.expected_allowance),
 
 		// Kiểm tra expires_at, nếu có thì cũng nhân 1000
 		expires_at: rawTx.expires_at ? new Date(rawTx.expires_at * 1000) : null,

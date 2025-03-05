@@ -41,11 +41,11 @@ export class Transaction extends BaseEntity {
 
 	@Field((_type) => Number, { nullable: true })
 	@Column("decimal", { nullable: true })
-	amount: number;
+	amount: number | null;
 
 	@Field((_type) => Number, { nullable: true })
 	@Column("decimal", { nullable: true })
-	fee: number;
+	fee: number | null;
 
 	@Field()
 	@Column()
@@ -57,11 +57,11 @@ export class Transaction extends BaseEntity {
 
 	@Field((_type) => Number, { nullable: true })
 	@Column("decimal", { nullable: true })
-	allowance: number;
+	allowance: number | null;
 
 	@Field((_type) => Number, { nullable: true })
 	@Column("decimal", { nullable: true })
-	expected_allowance: number;
+	expected_allowance: number | null;
 
 	@Field((_type) => Date, { nullable: true })
 	@Column({ type: "timestamp", nullable: true })
