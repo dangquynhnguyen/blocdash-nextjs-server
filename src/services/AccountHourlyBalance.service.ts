@@ -8,7 +8,6 @@ interface HourlyChange {
 	in: number;
 	out: number;
 	blocks: number[];
-	fees: number; // Add fee tracking per hour
 }
 
 export class AccountBalanceService {
@@ -81,12 +80,10 @@ export class AccountBalanceService {
 						in: 0,
 						out: 0,
 						blocks: [],
-						fees: 0,
 					});
 				}
 				const changes = hourlyChanges.get(key)!;
-				changes.out += Number(tx.amount);
-				changes.fees += Number(tx.fee || 0); // Add fees
+				changes.out += Number(tx.amount || 0) - (tx.fee || 0);
 				changes.blocks.push(tx.block_height);
 			}
 
@@ -98,7 +95,6 @@ export class AccountBalanceService {
 						in: 0,
 						out: 0,
 						blocks: [],
-						fees: 0,
 					});
 				}
 				const changes = hourlyChanges.get(key)!;
@@ -138,17 +134,14 @@ export class AccountBalanceService {
 
 			// Include fees in total_out
 			balance.total_out = (
-				Number(balance.total_out) +
-				(changes.out || 0) +
-				(changes.fees || 0)
+				Number(balance.total_out) + (changes.out || 0)
 			).toString();
 
 			// Include fees in final balance calculation
 			balance.balance = (
 				Number(balance.balance) +
 				(changes.in || 0) -
-				(changes.out || 0) -
-				(changes.fees || 0)
+				(changes.out || 0)
 			).toString();
 
 			balance.transaction_block_heights = [
