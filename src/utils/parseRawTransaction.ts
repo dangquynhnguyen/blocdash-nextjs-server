@@ -1,4 +1,4 @@
-import { OldTransaction } from "../entities/OldTransaction";
+import { Transaction } from "../entities/Transaction";
 
 export type RawTransaction = {
 	block_height: string;
@@ -21,7 +21,7 @@ export type RawTransaction = {
 
 export function parseRawTransaction(
 	rawTx: RawTransaction
-): Partial<OldTransaction> {
+): Partial<Transaction> {
 	const parseAmount = (value: string | null | undefined): number | null => {
 		if (!value) return null;
 		const parsed = parseFloat(value);
