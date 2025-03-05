@@ -16,11 +16,11 @@ export class OldTransaction extends BaseEntity {
 	parent_hash: string;
 
 	@Field()
-	@Column({ length: 64, type: "char" })
+	@Column({ length: 64, type: "char", nullable: true })
 	block_hash: string;
 
 	@Field()
-	@Column({ length: 64, type: "char" })
+	@Column({ length: 64, type: "char", nullable: true })
 	transaction_hash: string;
 
 	@Field()
