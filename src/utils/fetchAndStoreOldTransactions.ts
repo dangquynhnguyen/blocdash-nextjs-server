@@ -12,7 +12,7 @@ export const fetchAndStoreOldTransactions = async () => {
 		const max_height = query_result?.[0]?.max_height ?? 0;
 
 		const start_block_height = max_height;
-		const end_block_height = 20878670;
+		const end_block_height = 21047697;
 
 		if (start_block_height <= end_block_height) {
 			const URL_WTH_QUERY =
