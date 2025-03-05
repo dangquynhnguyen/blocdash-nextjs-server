@@ -37,15 +37,24 @@ export class AccountBalanceService {
 		});
 	}
 
+	private async getLastProcessedBlockHeight(
+		manager: EntityManager
+	): Promise<number> {
+		// Fix: Use LATERAL to handle array unnesting
+		const result = await manager.query(`
+            SELECT MAX(block_height) as max_height
+            FROM (
+                SELECT unnest(transaction_block_heights) as block_height
+                FROM account_hourly_balance
+            ) as heights
+        `);
+
+		return result[0]?.max_height || 0;
+	}
+
 	public async processNewTransactions(manager: EntityManager): Promise<void> {
 		// Get last processed block height
-		const lastProcessed = await manager
-			.createQueryBuilder()
-			.select("MAX(unnest(transaction_block_heights))", "max_height")
-			.from(AccountHourlyBalance, "ahb")
-			.getRawOne();
-
-		const lastBlockHeight = lastProcessed?.max_height || 0;
+		const lastBlockHeight = await this.getLastProcessedBlockHeight(manager);
 
 		// Get new transactions
 		const newTransactions = await manager.find(Transaction, {
