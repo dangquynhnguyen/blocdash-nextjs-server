@@ -36,7 +36,7 @@ export class OldTransaction extends BaseEntity {
 	spender_account_identifier: string;
 
 	@Field()
-	@Column({ length: 10 }) // Enum-like: TRANSFER, MINT, BURN, etc
+	@Column({ length: 10, nullable: true }) // Enum-like: TRANSFER, MINT, BURN, etc
 	transfer_type: string;
 
 	@Field((_type) => Number, { nullable: true })
