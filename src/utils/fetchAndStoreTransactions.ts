@@ -6,7 +6,7 @@ import { parseRawTransaction, RawTransaction } from "./parseRawTransaction";
 export const fetchAndStoreTransactions = async () => {
 	try {
 		const query_result = await Transaction.query(
-			`SELECT MAX(block_height) AS max_height FROM old_transaction`
+			`SELECT MAX(block_height) AS max_height FROM transaction`
 		);
 
 		const max_height = query_result?.[0]?.max_height ?? 0;
