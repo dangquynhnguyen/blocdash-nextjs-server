@@ -1,7 +1,8 @@
 import { startOfHour } from "date-fns";
-import { EntityManager, LessThan, MoreThanOrEqual } from "typeorm";
+import { EntityManager, LessThan, MoreThanOrEqual, Not } from "typeorm";
 import { AccountHourlyBalance } from "../entities/AccountHourlyBalance";
 import { Transaction } from "../entities/Transaction";
+import { TransferType } from "../enums/transfer_type.enum";
 
 interface HourlyChange {
 	in: number;
@@ -60,6 +61,7 @@ export class AccountBalanceService {
 		const newTransactions = await manager.find(Transaction, {
 			where: {
 				block_height: MoreThanOrEqual(lastBlockHeight),
+				transfer_type: Not(TransferType.APPROVE),
 			},
 			order: { block_height: "ASC" },
 		});

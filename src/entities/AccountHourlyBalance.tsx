@@ -12,8 +12,8 @@ import {
 import { getWalletCategory, WalletCategory } from "../enums/wallet.enum";
 
 @ObjectType()
-@Index("idx_account_hour", ["account_identifier", "hour"])
-@Index("wallet_category_hour", ["wallet_category", "hour"])
+@Index("idx_ahb_account_hour", ["account_identifier", "hour"])
+@Index("idx_ahb_wallet_category_hour", ["wallet_category", "hour"])
 @Entity()
 export class AccountHourlyBalance extends BaseEntity {
 	@Field((_type) => ID)
