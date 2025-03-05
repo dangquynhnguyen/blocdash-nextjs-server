@@ -83,7 +83,7 @@ export class AccountBalanceService {
 					});
 				}
 				const changes = hourlyChanges.get(key)!;
-				changes.out += Number(tx.amount || 0) - (tx.fee || 0);
+				changes.out += Number(tx.amount || 0) + (tx.fee || 0);
 				changes.blocks.push(tx.block_height);
 			}
 
