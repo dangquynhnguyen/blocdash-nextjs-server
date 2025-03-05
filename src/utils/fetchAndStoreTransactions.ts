@@ -9,7 +9,7 @@ export const fetchAndStoreTransactions = async () => {
 			`SELECT MAX(block_height) AS max_height FROM transaction`
 		);
 
-		const max_height = query_result?.[0]?.max_height ?? 0;
+		const max_height = query_result?.[0]?.max_height ?? -1;
 
 		const URL_WTH_QUERY =
 			URL_LEDGER_API_TRANSACTIONS_V2 +

@@ -10,7 +10,7 @@ dotenv.config();
 let connectionOptions: DataSourceOptions = {
 	type: "postgres",
 	url: process.env.DB_URL,
-	synchronize: true,
+	synchronize: false,
 	dropSchema: false,
 	logging: true,
 	// extra: {
@@ -21,7 +21,8 @@ let connectionOptions: DataSourceOptions = {
 	// ssl: true,
 	ssl: false,
 	entities: [User, Transaction],
-	migrations: [path.join(__dirname, "/migrations/*")],
+	migrations: [path.join(path.dirname(__dirname), "/migrations/*")],
+	migrationsTableName: "migrations",
 };
 
 export default new DataSource({

@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "blocdash",
   "main": "dist/index.js",
+  "type": "commonjs",
   "scripts": {
     "build": "tsc",
     "start": "node dist/index.js",
@@ -11,8 +12,9 @@
     "server-ts": "nodemon --exec ts-node src/index.ts",
     "watch": "tsc -w",
     "typeorm": "ts-node ./node_modules/typeorm/cli",
-    "migration:generate": "npx typeorm-ts-node-esm migration:generate src/migrations -d src/db/dataSourceProd.ts",
+    "migration:generate": "yarn typeorm migration:generate -- -d src/db/dataSourceProd.ts src/migrations/Auto",
     "migration:run": "yarn typeorm migration:run -d src/db/dataSourceProd.ts",
+    "migration:revert": "yarn typeorm migration:revert -- -d src/db/dataSourceProd.ts",
     "postbuild": "cpx src/public/**/* dist/public"
   },
   "author": "DN",
@@ -20,7 +22,7 @@
   "devDependencies": {
     "@types/express": "^5.0.0",
     "@types/express-session": "^1.18.1",
-    "@types/node": "^22.13.1",
+    "@types/node": "^22.13.9",
     "@types/node-cron": "^3.0.11",
     "@types/nodemailer": "^6.4.17",
     "@types/react": "^19.0.10",
@@ -28,7 +30,7 @@
     "cpx": "^1.5.0",
     "nodemon": "^3.1.9",
     "ts-node": "^10.9.2",
-    "typescript": "^5.7.3"
+    "typescript": "^5.8.2"
   },
   "dependencies": {
     "@emotion/react": "^11.14.0",
@@ -51,16 +53,16 @@
     "graphql": "^16.10.0",
     "graphql-scalars": "^1.24.1",
     "mongodb": "^6.13.0",
-    "mongoose": "~8.10.0",
+    "mongoose": "^8.12.1",
     "node-cron": "^3.0.3",
     "nodemailer": "^6.10.0",
     "nodemailer-plugin-inline-base64": "^2.1.1",
-    "pg": "^8.13.1",
+    "pg": "^8.13.3",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "reflect-metadata": "^0.2.2",
     "type-graphql": "^2.0.0-rc.2",
-    "typeorm": "^0.3.20",
+    "typeorm": "^0.3.21",
     "uuid": "^11.0.5"
   }
 }
