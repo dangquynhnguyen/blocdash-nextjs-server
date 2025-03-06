@@ -1,4 +1,3 @@
-import Big from "big.js";
 import { startOfHour } from "date-fns";
 import { EntityManager, LessThan, MoreThanOrEqual, Not } from "typeorm";
 import { AccountHourlyBalance } from "../entities/AccountHourlyBalance";
@@ -6,8 +5,8 @@ import { Transaction } from "../entities/Transaction";
 import { TransferType } from "../enums/transfer_type.enum";
 
 interface HourlyChange {
-	in: Big;
-	out: Big;
+	in: number;
+	out: number;
 	blocks: number[];
 }
 
@@ -54,18 +53,6 @@ export class AccountBalanceService {
 		return result[0]?.max_height || 0;
 	}
 
-	private formatNumeric(value: number | string): string {
-		try {
-			// Use Big.js for precise decimal arithmetic
-			const bigValue = new Big(value || 0);
-			// Set precision to match your database (scale: 8)
-			return bigValue.toFixed(8);
-		} catch (error) {
-			console.error("Error formatting numeric value:", value, error);
-			return "0.00000000";
-		}
-	}
-
 	public async processNewTransactions(manager: EntityManager): Promise<void> {
 		// Get last processed block height
 		const lastBlockHeight = await this.getLastProcessedBlockHeight(manager);
@@ -90,15 +77,13 @@ export class AccountBalanceService {
 				const key = `${tx.from_account_identifier}_${hour}`;
 				if (!hourlyChanges.has(key)) {
 					hourlyChanges.set(key, {
-						in: new Big(0),
-						out: new Big(0),
+						in: 0,
+						out: 0,
 						blocks: [],
 					});
 				}
 				const changes = hourlyChanges.get(key)!;
-				changes.out = changes.out.plus(
-					new Big((tx.amount || 0) + (tx.fee || 0))
-				);
+				changes.out += (tx.amount || 0) + (tx.fee || 0);
 				changes.blocks.push(tx.block_height);
 			}
 
@@ -107,13 +92,13 @@ export class AccountBalanceService {
 				const key = `${tx.to_account_identifier}_${hour}`;
 				if (!hourlyChanges.has(key)) {
 					hourlyChanges.set(key, {
-						in: new Big(0),
-						out: new Big(0),
+						in: 0,
+						out: 0,
 						blocks: [],
 					});
 				}
 				const changes = hourlyChanges.get(key)!;
-				changes.in = changes.in.plus(new Big(tx.amount!));
+				changes.in += tx.amount!;
 				changes.blocks.push(tx.block_height);
 			}
 		}
@@ -135,26 +120,23 @@ export class AccountBalanceService {
 				balance = manager.create(AccountHourlyBalance, {
 					account_identifier: accountId,
 					hour: hour,
-					balance: prevBalance?.balance || "0",
-					total_in: "0",
-					total_out: "0",
+					balance: prevBalance?.balance || 0,
+					total_in: 0,
+					total_out: 0,
 					transaction_block_heights: [],
 				});
 			}
 
 			// Update balances with safe number conversion
-			const currentIn = new Big(balance.total_in) || 0;
-			const currentOut = new Big(balance.total_out) || 0;
-			const currentBalance = new Big(balance.balance) || 0;
-			const incomingAmount = new Big(changes.in || 0);
-			const outgoingAmount = new Big(changes.out || 0);
+			// const currentIn = new Big(balance.total_in) || 0;
+			// const currentOut = new Big(balance.total_out) || 0;
+			// const currentBalance = new Big(balance.balance) || 0;
+			// const incomingAmount = new Big(changes.in || 0);
+			// const outgoingAmount = new Big(changes.out || 0);
 
-			balance.total_in = currentIn.plus(incomingAmount).toFixed(8);
-			balance.total_out = currentOut.plus(outgoingAmount).toFixed(8);
-			balance.balance = currentBalance
-				.plus(incomingAmount)
-				.minus(outgoingAmount)
-				.toFixed(8);
+			balance.total_in += changes.in;
+			balance.total_out += changes.out;
+			balance.balance = balance.balance + changes.in - changes.out;
 
 			balance.transaction_block_heights = [
 				...balance.transaction_block_heights,

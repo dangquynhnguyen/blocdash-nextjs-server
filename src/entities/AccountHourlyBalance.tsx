@@ -26,15 +26,15 @@ export class AccountHourlyBalance extends BaseEntity {
 
 	@Field()
 	@Column("numeric", { precision: 38, scale: 8 })
-	balance: string; // 16 bytes
+	balance: number;
 
 	@Field()
 	@Column("numeric", { precision: 38, scale: 8 })
-	total_in: string; // 16 bytes
+	total_in: number;
 
 	@Field()
 	@Column("numeric", { precision: 38, scale: 8 })
-	total_out: string; // 16 bytes
+	total_out: number;
 
 	@Field(() => [Int], { nullable: true })
 	@Column("bigint", { array: true, nullable: true })
@@ -51,7 +51,7 @@ export class AccountHourlyBalance extends BaseEntity {
 	@BeforeInsert()
 	@BeforeUpdate()
 	updateWalletCategory() {
-		const balanceNum = parseFloat(this.balance);
+		const balanceNum = this.balance;
 		this.wallet_category = getWalletCategory(balanceNum);
 	}
 }
