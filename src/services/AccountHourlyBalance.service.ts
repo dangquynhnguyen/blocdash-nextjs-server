@@ -1,3 +1,4 @@
+import Big from "big.js";
 import { startOfHour } from "date-fns";
 import { EntityManager, LessThan, MoreThanOrEqual, Not } from "typeorm";
 import { AccountHourlyBalance } from "../entities/AccountHourlyBalance";
@@ -54,7 +55,15 @@ export class AccountBalanceService {
 	}
 
 	private formatNumeric(value: number | string): string {
-		return Number(value).toString();
+		try {
+			// Use Big.js for precise decimal arithmetic
+			const bigValue = new Big(value || 0);
+			// Set precision to match your database (scale: 8)
+			return bigValue.toFixed(8);
+		} catch (error) {
+			console.error("Error formatting numeric value:", value, error);
+			return "0.00000000";
+		}
 	}
 
 	public async processNewTransactions(manager: EntityManager): Promise<void> {
@@ -132,17 +141,18 @@ export class AccountBalanceService {
 			}
 
 			// Update balances with safe number conversion
-			const currentIn = Number(balance.total_in) || 0;
-			const currentOut = Number(balance.total_out) || 0;
-			const currentBalance = Number(balance.balance) || 0;
-			const incomingAmount = changes.in || 0;
-			const outgoingAmount = changes.out || 0;
+			const currentIn = new Big(balance.total_in) || 0;
+			const currentOut = new Big(balance.total_out) || 0;
+			const currentBalance = new Big(balance.balance) || 0;
+			const incomingAmount = new Big(changes.in || 0);
+			const outgoingAmount = new Big(changes.out || 0);
 
-			balance.total_in = this.formatNumeric(currentIn + incomingAmount);
-			balance.total_out = this.formatNumeric(currentOut + outgoingAmount);
-			balance.balance = this.formatNumeric(
-				currentBalance + incomingAmount - outgoingAmount
-			);
+			balance.total_in = currentIn.plus(incomingAmount).toFixed(8);
+			balance.total_out = currentOut.plus(outgoingAmount).toFixed(8);
+			balance.balance = currentBalance
+				.plus(incomingAmount)
+				.minus(outgoingAmount)
+				.toFixed(8);
 
 			balance.transaction_block_heights = [
 				...balance.transaction_block_heights,

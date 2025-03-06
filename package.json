@@ -20,6 +20,7 @@
   "author": "DN",
   "license": "MIT",
   "devDependencies": {
+    "@types/big.js": "^6.2.2",
     "@types/express": "^5.0.0",
     "@types/express-session": "^1.18.1",
     "@types/node": "^22.13.9",
@@ -44,6 +45,7 @@
     "apollo-server-express": "^3.13.0",
     "argon2": "^0.41.1",
     "axios": "^1.7.9",
+    "big.js": "^6.2.2",
     "class-validator": "^0.14.1",
     "connect-mongo": "^5.1.0",
     "cors": "^2.8.5",
