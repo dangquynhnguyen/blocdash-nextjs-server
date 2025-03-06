@@ -53,10 +53,23 @@ export class AccountBalanceService {
 		return result[0]?.max_height || 0;
 	}
 
-	private formatNumeric(value: number): string {
-		// Ensure valid numeric format and handle edge cases
-		if (isNaN(value)) return "0";
-		return value.toFixed(8); // Use 8 decimal places for ICP
+	private formatNumeric(value: number | string): string {
+		// Handle string inputs
+		if (typeof value === "string") {
+			value = Number(value);
+		}
+
+		// Handle invalid numbers
+		if (typeof value !== "number" || isNaN(value)) {
+			return "0.00000000";
+		}
+
+		try {
+			return value.toFixed(8); // 8 decimal places for ICP
+		} catch (error) {
+			console.error("Error formatting numeric value:", value, error);
+			return "0.00000000";
+		}
 	}
 
 	public async processNewTransactions(manager: EntityManager): Promise<void> {
@@ -133,19 +146,17 @@ export class AccountBalanceService {
 				});
 			}
 
-			// Update balances
-			balance.total_in = this.formatNumeric(
-				Number(balance.total_in) + (changes.in || 0)
-			);
+			// Update balances with safe number conversion
+			const currentIn = Number(balance.total_in) || 0;
+			const currentOut = Number(balance.total_out) || 0;
+			const currentBalance = Number(balance.balance) || 0;
+			const incomingAmount = changes.in || 0;
+			const outgoingAmount = changes.out || 0;
 
-			// Include fees in total_out
-			balance.total_out = this.formatNumeric(
-				Number(balance.total_out) + (changes.out || 0)
-			);
-
-			// Include fees in final balance calculation
+			balance.total_in = this.formatNumeric(currentIn + incomingAmount);
+			balance.total_out = this.formatNumeric(currentOut + outgoingAmount);
 			balance.balance = this.formatNumeric(
-				Number(balance.balance) + (changes.in || 0) - (changes.out || 0)
+				currentBalance + incomingAmount - outgoingAmount
 			);
 
 			balance.transaction_block_heights = [
