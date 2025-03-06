@@ -53,6 +53,12 @@ export class AccountBalanceService {
 		return result[0]?.max_height || 0;
 	}
 
+	private formatNumeric(value: number): string {
+		// Ensure valid numeric format and handle edge cases
+		if (isNaN(value)) return "0";
+		return value.toFixed(8); // Use 8 decimal places for ICP
+	}
+
 	public async processNewTransactions(manager: EntityManager): Promise<void> {
 		// Get last processed block height
 		const lastBlockHeight = await this.getLastProcessedBlockHeight(manager);
@@ -128,21 +134,19 @@ export class AccountBalanceService {
 			}
 
 			// Update balances
-			balance.total_in = (
+			balance.total_in = this.formatNumeric(
 				Number(balance.total_in) + (changes.in || 0)
-			).toString();
+			);
 
 			// Include fees in total_out
-			balance.total_out = (
+			balance.total_out = this.formatNumeric(
 				Number(balance.total_out) + (changes.out || 0)
-			).toString();
+			);
 
 			// Include fees in final balance calculation
-			balance.balance = (
-				Number(balance.balance) +
-				(changes.in || 0) -
-				(changes.out || 0)
-			).toString();
+			balance.balance = this.formatNumeric(
+				Number(balance.balance) + (changes.in || 0) - (changes.out || 0)
+			);
 
 			balance.transaction_block_heights = [
 				...balance.transaction_block_heights,
