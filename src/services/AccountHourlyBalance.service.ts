@@ -127,13 +127,6 @@ export class AccountBalanceService {
 				});
 			}
 
-			// Update balances with safe number conversion
-			// const currentIn = new Big(balance.total_in) || 0;
-			// const currentOut = new Big(balance.total_out) || 0;
-			// const currentBalance = new Big(balance.balance) || 0;
-			// const incomingAmount = new Big(changes.in || 0);
-			// const outgoingAmount = new Big(changes.out || 0);
-
 			balance.total_in += changes.in;
 			balance.total_out += changes.out;
 			balance.balance = balance.balance + changes.in - changes.out;
