@@ -54,22 +54,7 @@ export class AccountBalanceService {
 	}
 
 	private formatNumeric(value: number | string): string {
-		// Handle string inputs
-		if (typeof value === "string") {
-			value = Number(value);
-		}
-
-		// Handle invalid numbers
-		if (typeof value !== "number" || isNaN(value)) {
-			return "0.00000000";
-		}
-
-		try {
-			return value.toFixed(8); // 8 decimal places for ICP
-		} catch (error) {
-			console.error("Error formatting numeric value:", value, error);
-			return "0.00000000";
-		}
+		return Number(value).toString();
 	}
 
 	public async processNewTransactions(manager: EntityManager): Promise<void> {
