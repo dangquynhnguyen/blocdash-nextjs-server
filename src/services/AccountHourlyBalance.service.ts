@@ -6,8 +6,8 @@ import { Transaction } from "../entities/Transaction";
 import { TransferType } from "../enums/transfer_type.enum";
 
 interface HourlyChange {
-	in: number;
-	out: number;
+	in: Big;
+	out: Big;
 	blocks: number[];
 }
 
@@ -90,13 +90,15 @@ export class AccountBalanceService {
 				const key = `${tx.from_account_identifier}_${hour}`;
 				if (!hourlyChanges.has(key)) {
 					hourlyChanges.set(key, {
-						in: 0,
-						out: 0,
+						in: new Big(0),
+						out: new Big(0),
 						blocks: [],
 					});
 				}
 				const changes = hourlyChanges.get(key)!;
-				changes.out += Number(tx.amount || 0) + (tx.fee || 0);
+				changes.out = changes.out.plus(
+					new Big((tx.amount || 0) + (tx.fee || 0))
+				);
 				changes.blocks.push(tx.block_height);
 			}
 
@@ -105,13 +107,13 @@ export class AccountBalanceService {
 				const key = `${tx.to_account_identifier}_${hour}`;
 				if (!hourlyChanges.has(key)) {
 					hourlyChanges.set(key, {
-						in: 0,
-						out: 0,
+						in: new Big(0),
+						out: new Big(0),
 						blocks: [],
 					});
 				}
 				const changes = hourlyChanges.get(key)!;
-				changes.in += Number(tx.amount);
+				changes.in = changes.in.plus(new Big(tx.amount!));
 				changes.blocks.push(tx.block_height);
 			}
 		}
