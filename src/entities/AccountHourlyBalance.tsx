@@ -6,20 +6,11 @@ import {
 	BeforeUpdate,
 	Column,
 	Entity,
-	Index,
 	PrimaryColumn,
 } from "typeorm";
 import { getWalletCategory, WalletCategory } from "../enums/wallet.enum";
 
 @ObjectType()
-@Index("idx_ahb_account_hour", ["account_identifier", "hour"])
-@Index("idx_ahb_wallet_category_hour", ["wallet_category", "hour"])
-@Index("idx_ahb_hour", ["hour"]) // For fast filtering by hour
-@Index("idx_ahb_hour_wallet_account", [
-	"hour",
-	"wallet_category",
-	"account_identifier",
-]) // For the wallet count query
 @Entity()
 export class AccountHourlyBalance extends BaseEntity {
 	@Field((_type) => ID)
