@@ -5,7 +5,7 @@ import cors from "cors";
 import express, { Application } from "express";
 import session from "express-session";
 import mongoose from "mongoose";
-import { cron } from "node-cron";
+import cron from "node-cron";
 import "reflect-metadata";
 import { buildSchema } from "type-graphql";
 import { __prod__, COOKIE_NAME } from "./constants";
