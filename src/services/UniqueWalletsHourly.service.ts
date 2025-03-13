@@ -71,16 +71,10 @@ export class UniqueWalletsService {
 			`[UniqueWalletsService] Found ${hoursWithDataSet.size} hours with data`
 		);
 
-		// Track all unique wallet addresses we've seen
-		const allWallets = new Map<string, WalletCategory>(); // account_identifier -> latest category
-
-		// Preload all existing wallet data if resuming calculation
+		// Find the last hour we processed
 		let lastProcessedHour: Date | null = null;
 		if (existingHourSet.size > 0) {
-			console.log(`[UniqueWalletsService] Preloading existing wallet data...`);
-			console.time("Preloading wallets");
-
-			// Find the last hour we processed
+			console.log(`[UniqueWalletsService] Finding latest hour with stats...`);
 			const [lastHour] = await manager.query(`
                 SELECT hour FROM unique_wallets_hourly 
                 ORDER BY hour DESC LIMIT 1
@@ -88,39 +82,28 @@ export class UniqueWalletsService {
 
 			if (lastHour) {
 				lastProcessedHour = new Date(lastHour.hour);
-
-				// Get all unique wallets up to that hour
-				const allWalletsResult = await manager.query(
-					`
-                    SELECT DISTINCT account_identifier, wallet_category
-                    FROM account_hourly_balance
-                    WHERE hour <= $1
-                    ORDER BY account_identifier
-                `,
-					[lastProcessedHour]
-				);
-
-				// Add to our tracking map
-				allWalletsResult.forEach(
-					(wallet: {
-						account_identifier: string;
-						wallet_category: WalletCategory;
-					}) => {
-						allWallets.set(wallet.account_identifier, wallet.wallet_category);
-					}
-				);
-
 				console.log(
-					`[UniqueWalletsService] Preloaded ${allWallets.size} unique wallets up to ${lastProcessedHour.toISOString()}`
+					`[UniqueWalletsService] Latest hour with stats: ${lastProcessedHour.toISOString()}`
 				);
-			}
 
-			console.timeEnd("Preloading wallets");
+				// Remove this hour from the set of hours to skip
+				// so we update this hour with fresh data
+				const lastHourKey = lastProcessedHour.toISOString();
+				existingHourSet.delete(lastHourKey);
+
+				// Delete the latest record so we can replace it
+				console.log(
+					`[UniqueWalletsService] Deleting latest record to recalculate it`
+				);
+				await manager.query(`
+                    DELETE FROM unique_wallets_hourly WHERE hour = '${lastHourKey}'
+                `);
+			}
 		}
 
 		// Process all hours in sequence
 		const currentHour = lastProcessedHour
-			? new Date(lastProcessedHour.getTime() + 3600000) // start from next hour
+			? new Date(lastProcessedHour.getTime()) // Start FROM the latest hour
 			: new Date(startHour);
 
 		let processedCount = 0;
@@ -143,7 +126,7 @@ export class UniqueWalletsService {
 			// Format hour for consistent comparison
 			const hourKey = currentHour.toISOString();
 
-			// Skip hours that already have stats
+			// Skip hours that already have stats (except the latest hour which we deliberately removed)
 			if (existingHourSet.has(hourKey)) {
 				// We should still get the last stats for future copying
 				lastStats = await manager.findOne(UniqueWalletsHourly, {
@@ -174,46 +157,60 @@ export class UniqueWalletsService {
 						);
 						console.time(`Calculate ${hourKey}`);
 
-						// Get all wallets active in this hour
-						const newWallets = await transactionManager.query(`
-                            SELECT DISTINCT 
+						// Get most recent category for ALL wallets up to this hour
+						// using a WITH query with ROW_NUMBER to get the most recent category for each wallet
+						const mostRecentCategoriesResult = await transactionManager.query(`
+                            WITH RankedWallets AS (
+                                SELECT 
+                                    account_identifier, 
+                                    wallet_category,
+                                    ROW_NUMBER() OVER(PARTITION BY account_identifier ORDER BY hour DESC) as rn
+                                FROM 
+                                    account_hourly_balance
+                                WHERE 
+                                    hour <= '${hourKey}'
+                            )
+                            SELECT 
                                 account_identifier, 
                                 wallet_category
                             FROM 
-                                account_hourly_balance
+                                RankedWallets
                             WHERE 
-                                hour = '${hourKey}'
+                                rn = 1
                         `);
 
-						// Add any new wallets to our tracking map
-						newWallets.forEach(
-							(wallet: {
+						// Create a map to track most recent category for each wallet
+						const walletMostRecentCategory = new Map<string, WalletCategory>();
+
+						// Update our tracking map with the most recent category for each wallet
+						mostRecentCategoriesResult.forEach(
+							(result: {
 								account_identifier: string;
 								wallet_category: WalletCategory;
 							}) => {
-								allWallets.set(
-									wallet.account_identifier,
-									wallet.wallet_category
+								walletMostRecentCategory.set(
+									result.account_identifier,
+									result.wallet_category
 								);
 							}
 						);
 
-						// Create a map to count wallets by category
+						// Initialize category map with zeros
 						const walletsByCategory = new Map<WalletCategory, number>();
 						Object.values(WalletCategory).forEach((category) => {
 							walletsByCategory.set(category, 0);
 						});
 
-						// Count wallets by category
-						for (const category of allWallets.values()) {
+						// Count wallets by their most recent category
+						for (const [_, category] of walletMostRecentCategory.entries()) {
 							const currentCount = walletsByCategory.get(category) || 0;
 							walletsByCategory.set(category, currentCount + 1);
 						}
 
-						// Create new record
+						// Create new record with all data
 						const hourlyStats = new UniqueWalletsHourly();
 						hourlyStats.hour = new Date(currentHour);
-						hourlyStats.total_wallets = allWallets.size;
+						hourlyStats.total_wallets = walletMostRecentCategory.size;
 
 						// Set counts by category
 						hourlyStats.plankton_count =
@@ -235,13 +232,22 @@ export class UniqueWalletsService {
 						hourlyStats.humpback_count =
 							walletsByCategory.get(WalletCategory.HUMPBACK) || 0;
 
+						// Verify total matches the sum of categories
+						const totalFromCategories = Array.from(
+							walletsByCategory.values()
+						).reduce((sum, count) => sum + count, 0);
+
+						console.log(
+							`[UniqueWalletsService] Sum of categories: ${totalFromCategories}, Total unique wallets: ${hourlyStats.total_wallets}`
+						);
+
 						// Save to database - this will commit at the end of this transaction
 						await transactionManager.save(hourlyStats);
 						lastStats = hourlyStats;
 						calculatedCount++;
 
 						console.log(
-							`[UniqueWalletsService] Calculated stats for hour ${hourKey}: ${hourlyStats.total_wallets} total unique wallets (${newWallets.length} new in this hour)`
+							`[UniqueWalletsService] Calculated stats for hour ${hourKey}: ${hourlyStats.total_wallets} total unique wallets`
 						);
 						console.timeEnd(`Calculate ${hourKey}`);
 
@@ -263,21 +269,63 @@ export class UniqueWalletsService {
 								`[UniqueWalletsService] No previous stats to copy from, creating empty record`
 							);
 
-							// Create empty record with current cumulative counts
-							const emptyStats = new UniqueWalletsHourly();
-							emptyStats.hour = new Date(currentHour);
-							emptyStats.total_wallets = allWallets.size;
+							// Get most recent category for ALL wallets up to this hour
+							const mostRecentCategoriesResult =
+								await transactionManager.query(`
+                                WITH RankedWallets AS (
+                                    SELECT 
+                                        account_identifier, 
+                                        wallet_category,
+                                        ROW_NUMBER() OVER(PARTITION BY account_identifier ORDER BY hour DESC) as rn
+                                    FROM 
+                                        account_hourly_balance
+                                    WHERE 
+                                        hour < '${hourKey}'
+                                )
+                                SELECT 
+                                    account_identifier, 
+                                    wallet_category
+                                FROM 
+                                    RankedWallets
+                                WHERE 
+                                    rn = 1
+                            `);
 
-							// Count wallets by category
+							// Create a map to track most recent category for each wallet
+							const walletMostRecentCategory = new Map<
+								string,
+								WalletCategory
+							>();
+
+							// Update our tracking map with the most recent category for each wallet
+							mostRecentCategoriesResult.forEach(
+								(result: {
+									account_identifier: string;
+									wallet_category: WalletCategory;
+								}) => {
+									walletMostRecentCategory.set(
+										result.account_identifier,
+										result.wallet_category
+									);
+								}
+							);
+
+							// Initialize category map with zeros
 							const walletsByCategory = new Map<WalletCategory, number>();
 							Object.values(WalletCategory).forEach((category) => {
 								walletsByCategory.set(category, 0);
 							});
 
-							for (const category of allWallets.values()) {
+							// Count wallets by their most recent category
+							for (const [_, category] of walletMostRecentCategory.entries()) {
 								const currentCount = walletsByCategory.get(category) || 0;
 								walletsByCategory.set(category, currentCount + 1);
 							}
+
+							// Create empty record with calculated counts
+							const emptyStats = new UniqueWalletsHourly();
+							emptyStats.hour = new Date(currentHour);
+							emptyStats.total_wallets = walletMostRecentCategory.size;
 
 							// Set counts by category
 							emptyStats.plankton_count =
@@ -350,10 +398,8 @@ export class UniqueWalletsService {
 				console.log(
 					`[UniqueWalletsService] Progress: Processed ${processedCount}, Calculated ${calculatedCount}, Copied ${copiedCount}, Skipped ${skippedCount}`
 				);
-				console.log(
-					`[UniqueWalletsService] Current total unique wallets: ${allWallets.size}`
-				);
 				batchSize = 0;
+				batchStart = new Date();
 			}
 
 			// Move to next hour
@@ -362,9 +408,6 @@ export class UniqueWalletsService {
 
 		console.timeEnd("Total calculation time");
 		console.log(`[UniqueWalletsService] Completed calculation for all hours`);
-		console.log(
-			`[UniqueWalletsService] Final total unique wallets: ${allWallets.size}`
-		);
 		console.log(
 			`[UniqueWalletsService] Total hours processed: ${processedCount}`
 		);

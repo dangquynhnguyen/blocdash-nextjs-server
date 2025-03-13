@@ -1,4 +1,3 @@
-require("dotenv").config();
 import { ApolloServerPluginLandingPageGraphQLPlayground } from "apollo-server-core";
 import { ApolloServer } from "apollo-server-express";
 import MongoStore from "connect-mongo";
@@ -6,12 +5,16 @@ import cors from "cors";
 import express, { Application } from "express";
 import session from "express-session";
 import mongoose from "mongoose";
+import { cron } from "node-cron";
 import "reflect-metadata";
 import { buildSchema } from "type-graphql";
 import { __prod__, COOKIE_NAME } from "./constants";
 import AppDataSource from "./db/dataSourceProd";
 import { UserResolver } from "./resolvers/user";
 import { calculateUniqueWalletStats } from "./utils/calculateUniqueWalletStats";
+import { fetchAndStoreTransactions } from "./utils/fetchAndStoreTransactions";
+import { updateAccountBalances } from "./utils/updateAccountHourlyBalance";
+require("dotenv").config();
 
 const app: Application = express();
 
@@ -86,8 +89,8 @@ const main = async () => {
 	);
 
 	// Schedule the heartbeat function to run every minute
-	// cron.schedule("30 * * * * *", fetchAndStoreTransactions);
-	// cron.schedule("* * * * *", updateAccountBalances);
+	cron.schedule("30 * * * * *", fetchAndStoreTransactions);
+	cron.schedule("* * * * *", updateAccountBalances);
 
 	// Run immediately on server start
 	calculateUniqueWalletStats();
