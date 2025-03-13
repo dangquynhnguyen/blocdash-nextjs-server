@@ -11,7 +11,6 @@ import { buildSchema } from "type-graphql";
 import { __prod__, COOKIE_NAME } from "./constants";
 import AppDataSource from "./db/dataSourceProd";
 import { UserResolver } from "./resolvers/user";
-import { calculateUniqueWalletStats } from "./utils/calculateUniqueWalletStats";
 import { fetchAndStoreTransactions } from "./utils/fetchAndStoreTransactions";
 import { updateAccountBalances } from "./utils/updateAccountHourlyBalance";
 require("dotenv").config();
@@ -93,7 +92,7 @@ const main = async () => {
 	cron.schedule("* * * * *", updateAccountBalances);
 
 	// Run immediately on server start
-	calculateUniqueWalletStats();
+	// calculateUniqueWalletStats();
 };
 
 main().catch((error) => console.log(error));
