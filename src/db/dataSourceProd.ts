@@ -4,6 +4,7 @@ import "reflect-metadata";
 import { DataSource, DataSourceOptions } from "typeorm";
 import { AccountHourlyBalance } from "../entities/AccountHourlyBalance";
 import { Transaction } from "../entities/Transaction";
+import { UniqueWalletsHourly } from "../entities/UniqueWalletsHourly";
 import { User } from "../entities/User";
 
 dotenv.config();
@@ -21,7 +22,7 @@ let connectionOptions: DataSourceOptions = {
 	// },
 	// ssl: true,
 	ssl: false,
-	entities: [User, Transaction, AccountHourlyBalance],
+	entities: [User, Transaction, AccountHourlyBalance, UniqueWalletsHourly],
 	migrations: [path.join(path.dirname(__dirname), "/migrations/*")],
 	migrationsTableName: "migrations",
 };

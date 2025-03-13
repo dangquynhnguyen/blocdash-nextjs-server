@@ -6,14 +6,12 @@ import cors from "cors";
 import express, { Application } from "express";
 import session from "express-session";
 import mongoose from "mongoose";
-import cron from "node-cron";
 import "reflect-metadata";
 import { buildSchema } from "type-graphql";
 import { __prod__, COOKIE_NAME } from "./constants";
 import AppDataSource from "./db/dataSourceProd";
 import { UserResolver } from "./resolvers/user";
-import { fetchAndStoreTransactions } from "./utils/fetchAndStoreTransactions";
-import { updateAccountBalances } from "./utils/updateAccountHourlyBalance";
+import { calculateUniqueWalletStats } from "./utils/calculateUniqueWalletStats";
 
 const app: Application = express();
 
@@ -87,10 +85,12 @@ const main = async () => {
 		)
 	);
 
-	//////
-	// Schedule the heartbeat function to run every hour
-	cron.schedule("30 * * * * *", fetchAndStoreTransactions);
-	cron.schedule("* * * * *", updateAccountBalances);
+	// Schedule the heartbeat function to run every minute
+	// cron.schedule("30 * * * * *", fetchAndStoreTransactions);
+	// cron.schedule("* * * * *", updateAccountBalances);
+
+	// Run immediately on server start
+	calculateUniqueWalletStats();
 };
 
 main().catch((error) => console.log(error));
