@@ -425,5 +425,238 @@ export class UniqueWalletsService {
 		);
 	}
 
-	// Keep the calculateHourlyStats method for cron jobs
+	/**
+	 * Updates unique wallet stats incrementally, processing a limited number of hours each run.
+	 * Scheduled to run every minute.
+	 */
+	public async incrementalUpdateStats(
+		manager: EntityManager,
+		maxHoursToProcess: number = 60
+	) {
+		console.log(
+			`[UniqueWalletsService] Starting incremental update of wallet statistics`
+		);
+		console.time("Incremental update time");
+
+		// 1. Find the latest hour in unique_wallets_hourly
+		const [lastStatHour] = await manager.query(`
+        SELECT hour FROM unique_wallets_hourly 
+        ORDER BY hour DESC LIMIT 1
+    `);
+
+		if (!lastStatHour) {
+			console.log(
+				`[UniqueWalletsService] No existing stats found. Run the full calculation first.`
+			);
+			return;
+		}
+
+		const lastProcessedHour = new Date(lastStatHour.hour);
+		console.log(
+			`[UniqueWalletsService] Last processed hour: ${lastProcessedHour.toISOString()}`
+		);
+
+		// 2. Find the latest hour in account_hourly_balance
+		const [latestData] = await manager.query(`
+        SELECT MAX(hour) as max_hour FROM account_hourly_balance
+    `);
+
+		if (!latestData.max_hour) {
+			console.log(`[UniqueWalletsService] No new data to process.`);
+			return;
+		}
+
+		const latestDataHour = new Date(latestData.max_hour);
+		latestDataHour.setMinutes(0, 0, 0); // Ensure hour alignment
+
+		// 3. Delete the latest record as it might be incomplete
+		console.log(
+			`[UniqueWalletsService] Deleting latest stats record to recalculate`
+		);
+		await manager.query(`
+        DELETE FROM unique_wallets_hourly WHERE hour = '${lastProcessedHour.toISOString()}'
+    `);
+
+		// 4. Setup processing range - start from the last hour (to recalculate it)
+		const startHour = new Date(lastProcessedHour);
+		let currentHour = new Date(startHour);
+
+		// 5. Determine end hour (max hours to process or latest data hour, whichever comes first)
+		const maxEndHour = new Date(startHour);
+		maxEndHour.setHours(maxEndHour.getHours() + maxHoursToProcess);
+		const endHour = maxEndHour < latestDataHour ? maxEndHour : latestDataHour;
+
+		console.log(
+			`[UniqueWalletsService] Processing from ${startHour.toISOString()} to ${endHour.toISOString()}`
+		);
+		console.log(
+			`[UniqueWalletsService] Will process up to ${maxHoursToProcess} hours in this run`
+		);
+
+		// 6. Performance optimization: Query batching
+		let processedCount = 0;
+		let lastStats: UniqueWalletsHourly | null = null;
+
+		// Get the hour before our start to get the initial stats
+		if (startHour.getTime() > new Date(0).getTime()) {
+			const previousHour = new Date(startHour);
+			previousHour.setHours(previousHour.getHours() - 1);
+			lastStats = await manager.findOne(UniqueWalletsHourly, {
+				where: { hour: previousHour },
+			});
+		}
+
+		// 7. Process each hour in the limited range
+		while (currentHour <= endHour && processedCount < maxHoursToProcess) {
+			const hourKey = currentHour.toISOString();
+			console.log(`[UniqueWalletsService] Processing hour: ${hourKey}`);
+
+			await manager.connection.transaction(async (transactionManager) => {
+				try {
+					// Check if this hour has any data
+					const [hasData] = await transactionManager.query(`
+                    SELECT EXISTS (
+                        SELECT 1 FROM account_hourly_balance 
+                        WHERE hour = '${hourKey}'
+                        LIMIT 1
+                    ) as has_data
+                `);
+
+					if (hasData.has_data) {
+						// FIXED: Use standard CTE without MATERIALIZED keyword
+						const mostRecentCategoriesQuery = `
+                        WITH RankedWallets AS (
+                            SELECT DISTINCT ON (account_identifier) 
+                                account_identifier, 
+                                wallet_category
+                            FROM 
+                                account_hourly_balance
+                            WHERE 
+                                hour <= '${hourKey}'
+                            ORDER BY 
+                                account_identifier, 
+                                hour DESC
+                        )
+                        SELECT 
+                            wallet_category,
+                            COUNT(*) as count
+                        FROM 
+                            RankedWallets
+                        GROUP BY 
+                            wallet_category
+                    `;
+
+						// Get counts directly grouped by category
+						const categoryCounts = await transactionManager.query(
+							mostRecentCategoriesQuery
+						);
+
+						// Count total unique wallets
+						const [totalCount] = await transactionManager.query(`
+                        SELECT COUNT(DISTINCT account_identifier) as total
+                        FROM account_hourly_balance
+                        WHERE hour <= '${hourKey}'
+                    `);
+
+						// Create new stats record
+						const hourlyStats = new UniqueWalletsHourly();
+						hourlyStats.hour = new Date(currentHour);
+						hourlyStats.total_wallets = parseInt(totalCount.total);
+
+						// Initialize all category counts to 0
+						hourlyStats.plankton_count = 0;
+						hourlyStats.shrimp_count = 0;
+						hourlyStats.crab_count = 0;
+						hourlyStats.octopus_count = 0;
+						hourlyStats.fish_count = 0;
+						hourlyStats.dolphin_count = 0;
+						hourlyStats.shark_count = 0;
+						hourlyStats.whale_count = 0;
+						hourlyStats.humpback_count = 0;
+
+						// Set the counts from our grouped query
+						categoryCounts.forEach(
+							(result: { wallet_category: WalletCategory; count: string }) => {
+								const count = parseInt(result.count);
+								switch (result.wallet_category) {
+									case WalletCategory.PLANKTON:
+										hourlyStats.plankton_count = count;
+										break;
+									case WalletCategory.SHRIMP:
+										hourlyStats.shrimp_count = count;
+										break;
+									case WalletCategory.CRAB:
+										hourlyStats.crab_count = count;
+										break;
+									case WalletCategory.OCTOPUS:
+										hourlyStats.octopus_count = count;
+										break;
+									case WalletCategory.FISH:
+										hourlyStats.fish_count = count;
+										break;
+									case WalletCategory.DOLPHIN:
+										hourlyStats.dolphin_count = count;
+										break;
+									case WalletCategory.SHARK:
+										hourlyStats.shark_count = count;
+										break;
+									case WalletCategory.WHALE:
+										hourlyStats.whale_count = count;
+										break;
+									case WalletCategory.HUMPBACK:
+										hourlyStats.humpback_count = count;
+										break;
+								}
+							}
+						);
+
+						await transactionManager.save(hourlyStats);
+						lastStats = hourlyStats;
+
+						console.log(
+							`[UniqueWalletsService] Calculated stats for hour ${hourKey}: ${hourlyStats.total_wallets} total unique wallets`
+						);
+					} else if (lastStats) {
+						// Copy from previous hour if no data
+						const copiedStats = new UniqueWalletsHourly();
+						copiedStats.hour = new Date(currentHour);
+						copiedStats.total_wallets = lastStats.total_wallets;
+						copiedStats.plankton_count = lastStats.plankton_count;
+						copiedStats.shrimp_count = lastStats.shrimp_count;
+						copiedStats.crab_count = lastStats.crab_count;
+						copiedStats.octopus_count = lastStats.octopus_count;
+						copiedStats.fish_count = lastStats.fish_count;
+						copiedStats.dolphin_count = lastStats.dolphin_count;
+						copiedStats.shark_count = lastStats.shark_count;
+						copiedStats.whale_count = lastStats.whale_count;
+						copiedStats.humpback_count = lastStats.humpback_count;
+
+						await transactionManager.save(copiedStats);
+						lastStats = copiedStats;
+
+						console.log(
+							`[UniqueWalletsService] Copied stats for hour ${hourKey}`
+						);
+					}
+				} catch (error) {
+					console.error(
+						`[UniqueWalletsService] Error processing hour ${hourKey}:`,
+						error
+					);
+					throw error;
+				}
+			});
+
+			processedCount++;
+			currentHour.setHours(currentHour.getHours() + 1);
+		}
+
+		console.timeEnd("Incremental update time");
+		console.log(`[UniqueWalletsService] Processed ${processedCount} hours`);
+		console.log(
+			`[UniqueWalletsService] Next run will start at: ${currentHour.toISOString()}`
+		);
+
+		return processedCount;
+	}
 }
