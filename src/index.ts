@@ -97,7 +97,7 @@ const main = async () => {
 	// Run immediately on server start
 	// calculateUniqueWalletStats();
 
-	cron.schedule("20* * * * *", calculateUniqueWalletStats);
+	cron.schedule("20 * * * * *", calculateUniqueWalletStats);
 };
 
 main().catch((error) => console.log(error));
