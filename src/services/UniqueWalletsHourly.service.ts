@@ -665,7 +665,7 @@ export class UniqueWalletsService {
 	 */
 	public async incrementalUpdateStatsOptimized(
 		manager: EntityManager,
-		maxHoursToProcess: number = 5 // Giảm số giờ mỗi lần chạy để giảm tải
+		maxHoursToProcess: number = 60 // Giảm số giờ mỗi lần chạy để giảm tải
 	) {
 		console.log(`[UniqueWalletsService] Starting optimized incremental update`);
 		console.time("Incremental update time");
