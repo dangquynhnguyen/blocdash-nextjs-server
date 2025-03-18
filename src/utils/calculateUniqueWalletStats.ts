@@ -5,6 +5,6 @@ import { UniqueWalletsService } from "../services/UniqueWalletsHourly.service";
 export const calculateUniqueWalletStats = async () => {
 	await AppDataSource.manager.transaction(async (manager) => {
 		const service = new UniqueWalletsService();
-		await service.incrementalUpdateStats(manager);
+		await service.incrementalUpdateStatsOptimized(manager);
 	});
 };
