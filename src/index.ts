@@ -92,10 +92,6 @@ const main = async () => {
 	// Schedule the heartbeat function to run every minute
 	cron.schedule("40 * * * * *", fetchAndStoreTransactions);
 	cron.schedule("* * * * *", updateAccountBalances);
-
-	// Run immediately on server start
-	// calculateUniqueWalletStats();
-
 	cron.schedule("20 * * * * *", calculateUniqueWalletStats);
 };
 

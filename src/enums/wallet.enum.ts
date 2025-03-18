@@ -75,7 +75,3 @@ export function getWalletCategory(balance: number): WalletCategory {
 	}
 	return WalletCategory.PLANKTON; // Default for any balance < 1 ICP
 }
-
-export function getBalanceRange(category: WalletCategory): string {
-	return WALLET_CATEGORY_RANGES[category].description;
-}
