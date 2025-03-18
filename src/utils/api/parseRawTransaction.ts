@@ -1,4 +1,4 @@
-import { Transaction } from "../entities/Transaction";
+import { Transaction } from "../../entities/Transaction";
 
 export type RawTransaction = {
 	block_height: string;

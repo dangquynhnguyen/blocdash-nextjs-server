@@ -14,8 +14,8 @@ import { ForgotPasswordInput } from "../types/ForgotPassword";
 import { LoginInput } from "../types/LoginInput";
 import { RegisterInput } from "../types/RegisterInput";
 import { UserMutationResponse } from "../types/UserMutationResponse";
-import { sendEmail } from "../utils/sendEmail";
-import { validateRegisterInput } from "../utils/validateRegisterInput";
+import { sendEmail } from "../utils/email/sendEmail";
+import { validateRegisterInput } from "../utils/validation/validateRegisterInput";
 
 @Resolver()
 export class UserResolver {

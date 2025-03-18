@@ -1,5 +1,5 @@
-import AppDataSource from "../db/dataSourceProd";
-import { AccountBalanceService } from "../services/AccountHourlyBalance.service";
+import AppDataSource from "../../db/dataSourceProd";
+import { AccountBalanceService } from "../../services/AccountHourlyBalance.service";
 
 export async function updateAccountBalances() {
 	const service = new AccountBalanceService();

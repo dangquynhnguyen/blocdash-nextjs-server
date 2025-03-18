@@ -82,19 +82,6 @@ const text = {
 	margin: "24px 0",
 };
 
-const button = {
-	backgroundColor: "#ff621a",
-	borderRadius: "4px",
-	color: "#fff",
-	fontFamily: "'Open Sans', 'Helvetica Neue', Arial",
-	fontSize: "15px",
-	textDecoration: "none",
-	textAlign: "center" as const,
-	display: "block",
-	width: "210px",
-	padding: "14px 7px",
-};
-
 const imageSection = {
 	display: "flex",
 	padding: "35px 0 0 35px",
@@ -112,18 +99,6 @@ const footerText = {
 	...text,
 	fontSize: "12px",
 	padding: "0 20px",
-};
-
-const validityText = {
-	...text,
-	margin: "0px",
-	textAlign: "center" as const,
-};
-
-const verificationSection = {
-	display: "flex",
-	alignItems: "center",
-	justifyContent: "center",
 };
 
 const mainText = { ...text, marginBottom: "14px" };

@@ -1,6 +1,6 @@
 import axios from "axios";
-import { URL_LEDGER_API_TRANSACTIONS_V2 } from "../constants";
-import { Transaction } from "../entities/Transaction";
+import { URL_LEDGER_API_TRANSACTIONS_V2 } from "../../constants";
+import { Transaction } from "../../entities/Transaction";
 import { parseRawTransaction, RawTransaction } from "./parseRawTransaction";
 
 export const fetchAndStoreTransactions = async () => {
