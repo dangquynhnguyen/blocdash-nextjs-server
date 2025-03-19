@@ -11,7 +11,6 @@ import { __prod__, COOKIE_NAME } from "./constants";
 import AppDataSource from "./db/dataSourceProd";
 import { UniqueWalletsHourlyResolver } from "./resolvers/uniqueWalletsHourly";
 import { UserResolver } from "./resolvers/user";
-import { setupCronJobs } from "./utils/cron/scheduleTasks";
 
 require("dotenv").config();
 
@@ -88,7 +87,7 @@ const main = async () => {
 	);
 
 	// Schedule the heartbeat function to run every minute
-	setupCronJobs();
+	// setupCronJobs();
 };
 
 main().catch((error) => console.log(error));
