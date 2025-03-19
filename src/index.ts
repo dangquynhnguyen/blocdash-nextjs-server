@@ -87,7 +87,7 @@ const main = async () => {
 	);
 
 	// Schedule the heartbeat function to run every minute
-	// setupCronJobs();
+	setupCronJobs();
 };
 
 main().catch((error) => console.log(error));
